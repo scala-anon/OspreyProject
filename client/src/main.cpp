@@ -5,138 +5,162 @@
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <ctime>
+#include <cstdint>
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 using dp::service::ingestion::DpIngestionService;
 using dp::service::ingestion::RegisterProviderResponse_RegistrationResult;
-/* message(providerId)
-providerId: clear_providerId(), set_providerid(), _internal_set_providerid(),
-*/
 using dp::service::ingestion::IngestDataResponse_AckResult;
-/* message(numRows, numColumns)
-numRows: clear_numrows(), set_numrows(), _internal_set_numrows()
-
-numColumns: clear_numcolumns(), set_numcolumns(), _internal_set_numcolumns()
-*/
 using dp::service::ingestion::RegisterProviderResponse;
-/* message(responseTime, exceptionalResult, registrationResult)
-responseTime: has_responsetime(), clear_responsetime(), set_allocated_responsetime(), 
-unsafe_arena_set_allocated_resppnsetime()
-
-exceptionalResult: has_exceptionalresult(), _internal_has_exceptionalresult(), clear_exceptionalresult(),
-set_allocated_exceptionresult(), unsafe_arena_set_allocated_exceptionalresult(),
-
-registrationResult: has_registrationresult(), _internal_has_registrationresult(), clear_registrationresult(),
-set_allocated_registrationresult(), unsage_arena_set_allocated_registrationresult(),
-*/
 using dp::service::ingestion::RegisterProviderRequest;
-/* message(providerName, attributes, requestTime)
-providerName: clear_providername(), set_providername(), set_allocated_providername(), _internal_set_providername()
-
-attributes: clear_attributes(), add_attributes(), attributes_size(), _internal_attributes_size()
-
-requestTime: has_requesttime(), clear_requesttime(), set_allocated_requesttime(), 
-unsage_arena_set_allocated_requesttime() 
-*/
 using dp::service::ingestion::IngestDataResponse;
-/* message(clientRequestId, responseTime, providerId, exceptionResult, ackResult)
-clientRequestId: clear_clientrequestid(), set_clientrequestid(), set_allocated_clientrequestid(),
-_internal_set_clientrequestid()
-
-responseTime: has_responsetime(), clear_responsetime(), set_allocated_responsetime(), 
-unsafe_arena_set_allocated_resppnsetime()
-
-providerId: clear_providerId(), set_providerid(), _internal_set_providerid(),
-
-exceptionalResult: has_exceptionalresult(), _internal_has_exceptionalresult(), clear_exceptionalresult(),
-set_allocated_exceptionresult(), unsafe_arena_set_allocated_exceptionalresult()
-
-ackResult: has_ackresult(), _internal_has_ackresult(), clear_ackresult(),
-set_allocated_ackresult(), unsafe_arena_set_allocated_ackresult()
-*/
 using dp::service::ingestion::IngestDataRequest_IngestionDataFrame;
-/* message(dataColumns, dataTimestamps)
-dataColumns: datacolumns_size(), _internal_datacolumns_size(), clear_datacolumns(), add_datacolumns()
-
-dataTimestamps: has_datatimestamps(), clear_datatimestamps(), set_allocated_datatimestamps(),
-unsafe_arena_set_allocated_datatimestamps(), 
-*/
 using dp::service::ingestion::IngestDataRequest;
-/* message(attributes, clientRequestId, requestTime, eventMetadata, ingestDataFrame, providerId)
-attributes: clear_attributes(), add_attributes(), attributes_size(), _internal_attributes_size()
-
-clientRequestId: clear_clientrequestid(), set_clientrequestid(), set_allocated_clientrequestid(),
-_internal_set_clientrequestid()
-
-requestTime: has_requesttime(), clear_requesttime(), set_allocated_requesttime(), 
-unsage_arena_set_allocated_requesttime() 
-
-eventMetaData: has_eventmetadata(), clear_eventmetadata(), set_allocated_eventmetadata(), 
-unsafe_arena_set_allocated_eventmetadata()
-
-ingestionDataFrame: has_ingestiondataframe(), clear_ingestiondataframe(), set_allocated_ingestiondataframe(),
-unsafe_arena_set_allocated_ingestiondataframe()
-*/
-
-
 
 /*
     create RegisterProviderRequest message
     message will need providerName, attributes, and requestTime
     send message to rpc registerProvider this returns RegisterProviderResponse
     create IngestDataRequest message
-    message will need providerId, clientRequestId, requestTime, attributes(optional), eventMetaData(optional), and ingestionDataFrame 
+    message will need attributes(optional), clientRequestId, requestTime, eventMetadata(optional), ingestDataFrame, providerId 
     send message to ingestData this returns IngestDataResponse 
 */
 
-class IngestionClient {
-public:
-    IngestionClient(std::shared_ptr<Channel> channel)
-        : stub_(DpIngestionService::NewStub(channel)) {}
+// This function fills in a register request message based on user input and then return the message
+dp::service::ingestion::RegisterProviderRequest promptForProviderRequest() {
+    dp::service::ingestion::RegisterProviderRequest providerRequest;
+    
+    std::cout << "Enter the provider name: ";
+    std::string providerName;
+    std::getline(std::cin, providerName);
 
-    bool getOneData(const IngestDataRequest& datarequest, IngestDataResponse* dataresponse) {
-        ClientContext context;
-        Status status = stub_->ingestData(&context, datarequest, dataresponse);
-        if (!status.ok()) {
-            std::cerr << "getOneData failed: " << status.error_message() << std::endl;
-            return false;
+    if (!providerName.empty()) {
+        providerRequest.set_providername(providerName);
+    }
+    // add section for attributes (if needed)
+
+    auto now = std::chrono::system_clock::now();
+    auto now_ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    providerRequest.set_requesttime(now_ms);
+
+    return providerRequest;
+}
+
+void callRegisterProviderRpc(grpc::ClientContext& context, 
+                             std::shared_ptr<dp::service::ingestion::DpIngestionService::Stub> stub) {
+    // Create and populate the request message
+    dp::service::ingestion::RegisterProviderRequest request = promptForProviderRequest();
+    
+    // Create the response message
+    dp::service::ingestion::RegisterProviderResponse response;
+    
+    // Make the RPC call
+    grpc::Status status = stub->RegisterProvider(&context, request, &response);
+    
+    // Handle the response
+    if (status.ok()) {
+        std::cout << "RPC succeeded" << std::endl;
+        // Process the response if needed
+    } else {
+        std::cerr << "RPC failed: " << status.error_message() << std::endl;
+    }
+}
+
+// This function fills in a ingest data request message based on user input and then return the message
+dp::service::ingestion::IngestDataRequest promptForIngestData() {
+    dp::service::ingestion::IngestDataRequest DataRequest;
+    
+    // gets providerId value
+    std::cout << "Enter the provider id: ";
+    std::string providerIdIn;
+    std::getline(std::cin, providerIdIn);
+    uint32_t providerIdVal;
+    
+    try {
+        size_t pos;
+        unsigned long ulValue = std::stoul(providerIdIn, &pos);
+
+        if (pos != providerIdIn.length() || ulValue > std::numeric_limits<uint32_t>::max()) {
+            throw std::out_of_range("Input out of range or invalid");
         }
-        return true;
+        providerIdVal = static_cast<uint32_t>(ulValue);
+        DataRequest.set_providerid(providerIdVal);
+
+    } catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid input. Please enter a valid positive integer." << std::endl;
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Input out of range for uint32_t." << std::endl;
+    }
+    
+    // gets clientRequestId value
+    std::cout << "Enter the client request id: ";
+    std::string clientId;
+    std::getline(std::cin, clientId);
+
+    if (!clientId.empty()) {
+        DataRequest.set_clientrequestid(clientId);
     }
 
-private:
-    std::unique_ptr<DpIngestionService::Stub> stub_;
-};
+    // gets requestTime value
+    auto now = std::chrono::system_clock::now();
+    auto now_ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    DataRequest.set_requesttime(now_ms);
+
+    dp::service::ingestion::IngestDataRequest_IngestionDataFrame dataFrame = promptForIngestionDataFrame();
+    DataRequest.set_ingestiondataframe(dataFrame);
+
+    return DataRequest;
+}
+
+dp::service::ingestion::IngestDataRequest_IngestionDataFrame promptForIngestionDataFrame() {
+    dp::service::ingestion::IngestDataRequest_IngestionDataFrame DataFrame;
+
+    // gets requestTime value
+    auto now = std::chrono::system_clock::now();
+    auto now_ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+    DataFrame.set_requesttime(now_ms);
+
+    // add section for DataColumn
+
+    return DataFrame;
+}
+
+void callIngestDataRpc(grpc::ClientContext& context, 
+                      std::shared_ptr<dp::service::ingestion::DpIngestionService::Stub> stub) {
+    // Create and populate the request message
+    dp::service::ingestion::IngestDataRequest request = promptForIngestData();
+    
+    // Create the response message
+    dp::service::ingestion::IngestDataResponse response;
+    
+    // Make the RPC call
+    grpc::Status status = stub->IngestData(&context, request, &response);
+    
+    // Handle the response
+    if (status.ok()) {
+        std::cout << "RPC succeeded" << std::endl;
+        // Process the response if needed
+    } else {
+        std::cerr << "RPC failed: " << status.error_message() << std::endl;
+    }
+}
+
 int main(int argc, char* argv[])
 {
     auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
-    IngestionClient client(channel);
-    
-    IngestDataRequest datarequest;
-    IngestDataResponse dataresponse;
+    auto stub = dp::service::ingestion::DpIngestionService::NewStub(channel);
 
-    // Set fields for datarequest using setter methods
-    datarequest.set_providerid("providerId");
-    datarequest.set_clientrequestid("clientRequestId");
-    datarequest.set_requesttime("requestTime");
-    datarequest.set_attributes("attributes");
-    datarequest.set_eventmetadata("eventMetaData");
-    datarequest.set_ingestiondataframe("ingestionDataFrame");
+    // Set up the gRPC client context
+    grpc::ClientContext context;
     
-    // Set fields for dataresponse using setter methods
-    dataresponse.set_providerid("providerId");
-    dataresponse.set_clientrequestid("clientRequestId");
-    dataresponse.set_responsetime("responseTime");
-    
-    // datarequest = ("providerId","clientRequestId","requestTime","attributes","eventMetaData", "ingestionDataFrame");
-    // dataresponse = ("providerId","clientRequestId","responseTime");
-    if (client.getOneData(datarequest, &dataresponse)) {
-        std::cout << "Data Response - Provider ID: " << dataresponse.providerid() << std::endl;
-        std::cout << "Data Response - Client Request ID: " << dataresponse.clientrequestid() << std::endl;
-        std::cout << "Data Response - Response Time: " << dataresponse.responsetime() << std::endl;
-    }
-     
+    // Call the RPC methods
+    callRegisterProviderRpc(context, stub);
+    callIngestDataRpc(context, stub);
+
     return 0;
 }

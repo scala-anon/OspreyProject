@@ -544,6 +544,7 @@ client/CMakeFiles/client.dir/src/main.cpp.o: \
  /home/nick/.local/include/grpcpp/support/proto_buffer_reader.h \
  /home/nick/.local/include/grpcpp/support/proto_buffer_writer.h \
  /home/nick/.local/include/grpcpp/support/stub_options.h \
+ /home/nick/Documents/OspreyProject/build/proto/common.pb.h \
  /home/nick/.local/include/grpcpp/create_channel.h \
  /home/nick/.local/include/grpcpp/channel.h \
  /home/nick/.local/include/grpcpp/security/credentials.h \
@@ -561,4 +562,8 @@ client/CMakeFiles/client.dir/src/main.cpp.o: \
  /home/nick/.local/include/absl/strings/has_ostream_operator.h \
  /home/nick/.local/include/grpcpp/support/channel_arguments.h \
  /home/nick/.local/include/grpc/compression.h \
- /home/nick/.local/include/grpcpp/resource_quota.h
+ /home/nick/.local/include/grpcpp/resource_quota.h \
+ /usr/include/c++/12/fstream \
+ /usr/include/x86_64-linux-gnu/c++/12/bits/basic_file.h \
+ /usr/include/x86_64-linux-gnu/c++/12/bits/c++io.h \
+ /usr/include/c++/12/bits/fstream.tcc

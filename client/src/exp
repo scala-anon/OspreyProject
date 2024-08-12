@@ -1,0 +1,180 @@
+public static IngestDataRequest buildIngestionRequest(
+    IngestionRequestParams params,
+    List<DataColumn> dataColumnList
+) {
+IngestDataRequest.Builder requestBuilder = IngestDataRequest.newBuilder();
+
+if (params.providerId != null)  {
+    requestBuilder.setProviderId(params.providerId);
+}
+if (params.requestId != null) {
+    requestBuilder.setClientRequestId(params.requestId);
+}
+if (params.setRequestTime) {
+    requestBuilder.setRequestTime(TimestampUtility.getTimestampNow());
+}
+
+IngestDataRequest.IngestionDataFrame.Builder dataFrameBuilder
+        = IngestDataRequest.IngestionDataFrame.newBuilder();
+DataTimestamps.Builder dataTimestampsBuilder = DataTimestamps.newBuilder();
+
+// set DataTimestamps for request
+if (params.timestampsSecondsList != null) {
+    // use explicit timestamp list in DataTimestamps if specified in params
+
+    assertTrue(params.timestampNanosList != null);
+    assertTrue(params.timestampsSecondsList.size() == params.timestampNanosList.size());
+    TimestampList.Builder timestampListBuilder = TimestampList.newBuilder();
+    for (int i = 0; i < params.timestampsSecondsList.size(); i++) {
+        long seconds = params.timestampsSecondsList.get(i);
+        long nanos = params.timestampNanosList.get(i);
+        Timestamp.Builder timestampBuilder = Timestamp.newBuilder();
+        timestampBuilder.setEpochSeconds(seconds);
+        timestampBuilder.setNanoseconds(nanos);
+        timestampBuilder.build();
+        timestampListBuilder.addTimestamps(timestampBuilder);
+    }
+    timestampListBuilder.build();
+    dataTimestampsBuilder.setTimestampList(timestampListBuilder);
+    dataTimestampsBuilder.build();
+    dataFrameBuilder.setDataTimestamps(dataTimestampsBuilder);
+
+} else if (params.samplingClockStartSeconds != null) {
+    // otherwise use Samplingclock for DataTimestamps
+
+    assertTrue(params.samplingClockStartNanos != null);
+    assertTrue(params.samplingClockPeriodNanos != null);
+    assertTrue(params.samplingClockCount != null);
+    Timestamp.Builder startTimeBuilder = Timestamp.newBuilder();
+    startTimeBuilder.setEpochSeconds(params.samplingClockStartSeconds);
+    startTimeBuilder.setNanoseconds(params.samplingClockStartNanos);
+    startTimeBuilder.build();
+    SamplingClock.Builder samplingClockBuilder = SamplingClock.newBuilder();
+    samplingClockBuilder.setStartTime(startTimeBuilder);
+    samplingClockBuilder.setPeriodNanos(params.samplingClockPeriodNanos);
+    samplingClockBuilder.setCount(params.samplingClockCount);
+    samplingClockBuilder.build();
+    dataTimestampsBuilder.setSamplingClock(samplingClockBuilder);
+    dataTimestampsBuilder.build();
+    dataFrameBuilder.setDataTimestamps(dataTimestampsBuilder);
+}
+
+// create list of columns if specified
+if (dataColumnList != null) {
+    // caller can override building data columns by providing dataColumnList
+    for (DataColumn column : dataColumnList) {
+        dataFrameBuilder.addDataColumns(column);
+    }
+
+} else if (params.columnNames != null) {
+    assertTrue(params.values != null);
+    assertEquals(params.columnNames.size(), params.values.size());
+    if (params.valuesStatus != null) {
+        assertEquals(params.columnNames.size(), params.valuesStatus.size());
+    }
+    for (int i = 0 ; i < params.columnNames.size() ; i++) {
+        DataColumn.Builder dataColumnBuilder = DataColumn.newBuilder();
+        dataColumnBuilder.setName(params.columnNames.get(i));
+        DataValue.Builder dataValueBuilder = null;
+        if (params.valuesStatus != null) {
+            assertEquals(params.values.get(i).size(), params.valuesStatus.get(i).size());
+        }
+        int valueIndex = 0;
+        for (Object value : params.values.get(i)) {
+            switch (params.dataType) {
+                case STRING -> {
+                    dataValueBuilder = DataValue.newBuilder().setStringValue((String) value);
+                }
+                case DOUBLE -> {
+                    dataValueBuilder = DataValue.newBuilder().setDoubleValue((Double) value);
+                }
+                case INT -> {
+                    dataValueBuilder = DataValue.newBuilder().setLongValue((Long) value);
+                }
+                case BYTE_ARRAY -> {
+                }
+                case BOOLEAN -> {
+                    dataValueBuilder = DataValue.newBuilder().setBooleanValue((Boolean) value);
+                }
+                case IMAGE -> {
+                }
+                case STRUCTURE -> {
+                }
+                case ARRAY_DOUBLE -> {
+                    List<Double> doubleList = (List<Double>) value;
+                    Array.Builder arrayBuilder = Array.newBuilder();
+                    for (Double doubleValue : doubleList) {
+                        arrayBuilder.addDataValues(DataValue.newBuilder().setDoubleValue(doubleValue).build());
+                    }
+                    arrayBuilder.build();
+                    dataValueBuilder = DataValue.newBuilder().setArrayValue(arrayBuilder);
+                }
+            }
+
+            if (params.valuesStatus != null) {
+                DataValue.ValueStatus valueStatus = params.valuesStatus.get(i).get(valueIndex);
+                dataValueBuilder.setValueStatus(valueStatus);
+            }
+
+            dataColumnBuilder.addDataValues(dataValueBuilder.build());
+            valueIndex++;
+        }
+
+        dataColumnBuilder.build();
+        dataFrameBuilder.addDataColumns(dataColumnBuilder);
+    }
+}
+
+// add attributes if specified
+if (params.attributes != null) {
+    for (var attributeEntry : params.attributes.entrySet()) {
+        String attributeKey = attributeEntry.getKey();
+        String attributeValue = attributeEntry.getValue();
+        final Attribute.Builder attributeBuilder = Attribute.newBuilder();
+        attributeBuilder.setName(attributeKey);
+        attributeBuilder.setValue(attributeValue);
+        attributeBuilder.build();
+        requestBuilder.addAttributes(attributeBuilder);
+    }
+}
+
+// set event metadata if specified
+if (params.eventDescription != null ||  params.eventStartSeconds != null || params.eventStartNanos != null) {
+
+    EventMetadata.Builder eventMetadataBuilder = EventMetadata.newBuilder();
+
+    if (params.eventDescription != null) {
+        eventMetadataBuilder.setDescription(params.eventDescription);
+    }
+
+    if (params.eventStartSeconds != null || params.eventStartNanos != null) {
+        Timestamp.Builder eventStartTimeBuilder = Timestamp.newBuilder();
+        if (params.eventStartSeconds != null) {
+            eventStartTimeBuilder.setEpochSeconds(params.eventStartSeconds);
+        }
+        if (params.eventStartNanos != null) {
+            eventStartTimeBuilder.setNanoseconds(params.eventStartNanos);
+        }
+        eventStartTimeBuilder.build();
+        eventMetadataBuilder.setStartTimestamp(eventStartTimeBuilder);
+    }
+
+    if (params.eventStopSeconds != null || params.eventStopNanos != null) {
+        Timestamp.Builder eventStopTimeBuilder = Timestamp.newBuilder();
+        if (params.eventStopSeconds != null) {
+            eventStopTimeBuilder.setEpochSeconds(params.eventStopSeconds);
+        }
+        if (params.eventStopNanos != null) {
+            eventStopTimeBuilder.setNanoseconds(params.eventStopNanos);
+        }
+        eventStopTimeBuilder.build();
+        eventMetadataBuilder.setStopTimestamp(eventStopTimeBuilder);
+    }
+
+    eventMetadataBuilder.build();
+    requestBuilder.setEventMetadata(eventMetadataBuilder);
+}
+
+dataFrameBuilder.build();
+requestBuilder.setIngestionDataFrame(dataFrameBuilder);
+return requestBuilder.build();

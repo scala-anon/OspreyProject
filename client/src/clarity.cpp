@@ -38,35 +38,10 @@ using grpc::Status;
     13. build data value 
         14. message needs plethora of values
         15. read in header file to file values
+    14. will need to build a message for the data ingestion values 
     note: build this in reverse order when coding so that it builds
 */
 
-void DataValue SetDataValue(){
-    DataValue values;
-    vector<Signal> signals = parseSignals("/home/nick/Documents/data/mic1-8.hdr");
-    // need to check status meaning need to build data value status message 
-    values.set_bytearrayvalue(signals);
-    for (size_t i = 0; i < signals.size(); ++i) {
-    std::cout << "Signal Index: " << i << '\n'
-                  << "  Name: " << sig.name << '\n'
-                  << "  Chassis: " << sig.chassis << '\n'
-                  << "  Channel: " << sig.channel << '\n'
-                  << "  Egu: " << sig.egu << '\n'
-                  << "  Slope: " << sig.slope << '\n'
-                  << "  Intercept: " << sig.intercept << '\n'
-                  << "  Coupling: " << sig.coupling << '\n'
-                  << "  SigNum: " << sig.sigNum << '\n'
-                  << "  Description: " << sig.description << '\n'
-                  << "  Response Node: " << sig.responseNode << '\n'
-                  << "  Response Direction: " << sig.responseDirection << '\n'
-                  << "  Reference Node: " << sig.referenceNode << '\n'
-                  << "  Reference Direction: " << sig.referenceDirection << '\n'
-                  << std::endl;
-    }
-    
-}
-
-// Define the struct to hold the signal values
 struct Signal {
     int chassis;
     int channel;
@@ -83,78 +58,98 @@ struct Signal {
     int referenceDirection;
 };
 
-// Define an enum for easy access to specific signal values
-enum SignalValue {
-    CHASSIS,
-    CHANNEL,
-    NAME,
-    EGU,
-    SLOPE,
-    INTERCEPT,
-    COUPLING,
-    SIG_NUM,
-    DESCRIPTION,
-    RESPONSE_NODE,
-    RESPONSE_DIRECTION,
-    REFERENCE_NODE,
-    REFERENCE_DIRECTION
+// Struct to hold status information
+struct Status {
+    string message;
+    int statusCode;  // StatusCode enum value
+    int severity;    // Severity enum value
 };
 
-// Function to parse the JSON file and return a vector of Signal structs
-vector<Signal> parseSignals(const string& filename) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Could not open the file.\n";
-        return {};
+DataValue BuildDataValue(const Signal& sig, const string& type, const Status& status) {
+    DataValue dataValue;
+    
+    if (type == "string") {
+        dataValue.set_stringvalue(sig.name);
+    } else if (type == "boolean") {
+        // Assume a boolean value for demonstration
+        dataValue.set_booleanvalue(true);
+    } else if (type == "uint") {
+        dataValue.set_uintvalue(sig.chassis);
+    } else if (type == "ulong") {
+        dataValue.set_ulongvalue(static_cast<uint64_t>(sig.channel));
+    } else if (type == "int") {
+        dataValue.set_intvalue(sig.sigNum);
+    } else if (type == "long") {
+        dataValue.set_longvalue(static_cast<int64_t>(sig.referenceNode));
+    } else if (type == "float") {
+        dataValue.set_floatvalue(static_cast<float>(sig.slope));
+    } else if (type == "double") {
+        dataValue.set_doublevalue(sig.intercept);
+    } else if (type == "bytes") {
+        // Set byte array value if needed
+        string bytesValue; // Set to some byte data
+        dataValue.set_bytearrayvalue(bytesValue);
+    } else if (type == "array") {
+        // Build Array value if needed
+        Array arrayValue;
+        // Add values to arrayValue
+        dataValue.set_arrayvalue(arrayValue);
+    } else if (type == "structure") {
+        // Build Structure value if needed
+        Structure structureValue;
+        // Add fields to structureValue
+        dataValue.set_structurevalue(structureValue);
+    } else if (type == "image") {
+        // Build Image value if needed
+        Image imageValue;
+        // Set image value
+        dataValue.set_imagevalue(imageValue);
+    } else if (type == "timestamp") {
+        // Build Timestamp value if needed
+        Timestamp timestampValue;
+        // Set timestamp value
+        dataValue.set_timestampvalue(timestampValue);
     }
-
-    stringstream buffer;
-    buffer << file.rdbuf();
-    string content = buffer.str();
-    file.close();
-
-    nlohmann::json jsonData = nlohmann::json::parse(content);
-
-    vector<Signal> signals;
-
-    // Loop through the Signals array in the JSON data
-    for (const auto& signal : jsonData["Signals"]) {
-        Signal sig;
-        sig.chassis = signal["Address"]["Chassis"];
-        sig.channel = signal["Address"]["Channel"];
-        sig.name = signal["Name"];
-        sig.egu = signal["Egu"];
-        sig.slope = signal["Slope"];
-        sig.intercept = signal["Intercept"];
-        sig.coupling = signal["Coupling"];
-        sig.sigNum = signal["SigNum"];
-        sig.description = signal["Desc"];
-        sig.responseNode = signal["ResponseNode"];
-        sig.responseDirection = signal["ResponseDirection"];
-        sig.referenceNode = signal["ReferenceNode"];
-        sig.referenceDirection = signal["ReferenceDirection"];
-
-        // Store the Signal struct in the vector
-        signals.push_back(sig);
-    }
-
-    return signals;
+    
+    // Set the status of the data value
+    auto valueStatus = dataValue.mutable_valuestatus();
+    valueStatus->set_message(status.message);
+    valueStatus->set_statuscode(static_cast<ValueStatus::StatusCode>(status.statusCode));
+    valueStatus->set_severity(static_cast<ValueStatus::Severity>(status.severity));
+    
+    return dataValue;
 }
 
-void DataColumn 
+DataColumn BuildDataColumn(const string& name, const vector<DataValue>& dataValues) {
+    DataColumn dataColumn;
+    dataColumn.set_name(name);
+    for (const auto& dataValue : dataValues) {
+        *dataColumn.add_datavalues() = dataValue;
+    }
+    return dataColumn;
+}
 
 
+int main() {
+    // Example data
+    Signal sig = {1, 2, "Sensor1", "Egu1", 0.1, 0.01, "Coupling1", 100, "Desc1", 1, 1, 1, 1};
+    Status status = {"No error", ValueStatus::NO_STATUS, ValueStatus::NO_ALARM};
 
+    // Build DataValue
+    DataValue dataValue = BuildDataValue(sig, "string", status);
 
+    // Build DataColumn
+    vector<DataValue> dataValues = {dataValue};
+    DataColumn dataColumn = BuildDataColumn("item1", dataValues);
 
-int main(int argc, char* argv[])
-{
-    auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
-    auto stub = DpIngestionService::NewStub(channel);
-
-    // Set up the gRPC client context
-    ClientContext context;
-    
+    // Print DataColumn details
+    cout << "Data Column Name: " << dataColumn.name() << endl;
+    for (const auto& value : dataColumn.datavalues()) {
+        if (value.has_stringvalue()) {
+            cout << "Data Value: " << value.stringvalue() << endl;
+        }
+        // Handle other types similarly
+    }
 
     return 0;
 }

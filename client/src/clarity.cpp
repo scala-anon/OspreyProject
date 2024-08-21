@@ -10,7 +10,7 @@
 #include <string>
 #include <ctime>
 #include <cstdint>
-#include <nlohmann/json.hpp> // Include the nlohmann/json.hpp for JSON parsing since hdr file is close to json format
+#include <json.hpp> // Include the nlohmann/json.hpp for JSON parsing since hdr file is close to json format
 
 using namespace dp::service::ingestion;
 using namespace google::protobuf::internal;

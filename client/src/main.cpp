@@ -71,42 +71,39 @@ void callRegisterProviderRpc(ClientContext& context,
 IngestDataRequest promptForIngestData() {
     IngestDataRequest DataRequest;
     
-    // gets providerId value
-    std::cout << "Enter the provider id: ";
-    std::string providerIdIn;
-    std::getline(std::cin, providerIdIn);
-    uint32_t providerIdVal;
+    // sets providerId 
+    uint32_t providerIdVal = 1;
+    DataRequest.set_providerid(providerIdVal);
     
-    try {
-        size_t pos;
-        unsigned long ulValue = std::stoul(providerIdIn, &pos);
+    // sets clientRequestId 
+    std::string fileName = "counter.txt";
+    int counter = 1;
 
-        if (pos != providerIdIn.length() || ulValue > std::numeric_limits<uint32_t>::max()) {
-            throw std::out_of_range("Input out of range or invalid");
-        }
-        providerIdVal = static_cast<uint32_t>(ulValue);
-        DataRequest.set_providerid(providerIdVal);
-
-    } catch (const std::invalid_argument& e) {
-        std::cerr << "Invalid input. Please enter a valid positive integer." << std::endl;
-    } catch (const std::out_of_range& e) {
-        std::cerr << "Input out of range for uint32_t." << std::endl;
+    std::ifstream infile(fileName);
+    if(infile.is_open()){
+        infile >> counter;
+        infile.close();
     }
+    counter++;
+    std::stringstream ss;
+    ss << std::setw(4) << std::setfill('0') << counter;
+    std::string counterStr = ss.str();
     
-    // gets clientRequestId value
-    std::cout << "Enter the client request id: ";
-    std::string clientId;
-    std::getline(std::cin, clientId);
-
-    if (!clientId.empty()) {
-        DataRequest.set_clientrequestid(clientId);
+    DataRequest.set_clientrequestid(counterStr);
+    
+    std::ofstream outfile(filename);
+    if (outfile.is_open()) {
+        outfile << counter;
+        outfile.close();
     }
 
-    // gets requestTime value
+
+    // sets requestTime 
     auto now = std::chrono::system_clock::now();
-    auto now_ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
-    DataRequest.set_requesttime(now_ms);
+    auto now_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+    DataRequest.set_requesttime(now_nano);
 
+    // sets dataFrame 
     IngestDataRequest_IngestionDataFrame dataFrame = promptForIngestionDataFrame();
     DataRequest.set_ingestiondataframe(dataFrame);
 
@@ -118,13 +115,106 @@ IngestDataRequest_IngestionDataFrame promptForIngestionDataFrame() {
 
     // gets requestTime value
     auto now = std::chrono::system_clock::now();
-    auto now_ms = std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
-    DataFrame.set_requesttime(now_ms);
+    auto now_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+    DataFrame.set_requesttime(now_nano);
 
     // add section for DataColumn
 
     return DataFrame;
 }
+
+DataTimestamps SetDataTimeStamps(){
+    DataTimestamps dataTimeStamp;
+    SamplingClock clock = SetSamplingClock();
+
+    // sets samplingclock
+    dataTimeStamp.set_allocated_samplingclock(clock);
+
+    //TODO add set method for timestamplist
+}
+
+SamplingClock SetSamplingClock(){
+    SamplingClock clock;
+    TimeStamp time = SetTimeStamp;
+    std::string fileName = "";
+    std::vector<uint64_t> periodNano = measureLineReadTime(fileName);
+
+    //TODO make method that will read the number of samples in the contained interval   
+    uint32_t counter = 3;
+    
+    // set startTime
+    clock.set_allocated_starttime(time);
+
+    // set periodNanos
+    for(uint64_t number : periodNano){
+        clock.set_periodnanos(number);
+    }
+
+    // set count
+    clock.set_count(counter);
+    return(clock);
+}
+
+Timestamp SetTimeStamp(){
+    Timestamp clock;
+    // Get the current time point
+    uint64_t now = std::chrono::system_clock::now();
+
+    // Get the number of seconds since the Unix epoch
+    uint64_t epoch_seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+
+    // Get the number of nanoseconds since the Unix epoch
+    uint64_t epoch_nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+
+    // Calculate the number of nanoseconds within the current second
+    uint64_t nanoseconds_within_second = epoch_nanoseconds - (epoch_seconds * 1000000000LL);
+    
+    time.set_epochseconds(epoch_seconds);
+    time.set_nanoseconds(nanoseconds_within_second);
+    return(time);
+}
+
+std::vector<uint64_t> measureLineReadTime(const std::string& filename) {
+    // Open the file
+    std::ifstream file(filename);
+    std::vector<uint64_t> lineReadTimes;
+
+    if (!file.is_open()) {
+        std::cerr << "Could not open the file: " << filename << std::endl;
+        return lineReadTimes;  // Return an empty vector if the file couldn't be opened
+    }
+
+    std::string line;
+
+    // Read each line and measure the time taken
+    while (std::getline(file, line)) {
+        // Start time
+        auto start = std::chrono::high_resolution_clock::now();
+
+        // Here we simulate reading the line, but it's already read by std::getline
+        // Do any additional processing with the line here if necessary
+
+        // End time
+        auto end = std::chrono::high_resolution_clock::now();
+
+        // Calculate the time taken in nanoseconds
+        uint64_t periodNanos = static_cast<uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+        );
+
+        // Store the time taken for this line
+        lineReadTimes.push_back(periodNanos);
+    }
+
+    file.close();
+    return lineReadTimes;  // Return the vector of times
+}
+
+DataColumn SetDataColumn(){
+    DataColumn column;
+    
+}
+
 
 void callIngestDataRpc(ClientContext& context, 
                       std::shared_ptr<DpIngestionService::Stub> stub) {

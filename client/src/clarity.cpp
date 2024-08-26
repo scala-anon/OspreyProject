@@ -88,8 +88,8 @@ IngestDataRequest GetDataRequest(){
     string clientRequest = "0001";
     requestTime = GetTimeStamp;
     eventMetaData = GetEventMetaData;
-    int providerId = 0001;
-    IngestDataRequest_IngestionDataFrame dataFrame = 
+    int providerId = 1;
+    IngestDataRequest_IngestionDataFrame dataFrame = GetIngestionDataFrame;
 
 }
 
@@ -140,28 +140,19 @@ DataValue GetDataValue(){
     return dataValue;
 }
 
+DataValue_ValueStatus_StatusCode GetStatusCode(){
+    DataValue_ValueStatus_StatusCode statusCode;
+    return statusCode
+}
+DataValue_ValueStatus_Severity GetSeverity(){
+    DataValue_ValueStatus_Severity severity;
+    return severity;
+}
 DataValue_ValueStatus GetValueStatus(){
-    enum StatusCode {
-        NO_STATUS = 0;		// no status condition
-      DEVICE_STATUS = 1;	// hardware device condition
-      DRIVER_STATUS = 2;	// hardware driver condition
-      RECORD_STATUS = 3;	// device database record condition
-      DB_STATUS = 4; 		// device database condition
-      CONF_STATUS = 5;		// configuration condition
-      UNDEFINED_STATUS = 6;	// unknown or undefined status condition
-      CLIENT_STATUS = 7;	// data provider client condition
-    }
-    enum severity {
-        NO_ALARM = 0;			// no alarm conditions
-      MINOR_ALARM = 1;		// value has triggered a minor alarm condition
-      MAJOR_ALARM = 2;		// value has triggered a major alarm condition
-      INVALID_ALARM = 3;	// value has triggered an invalid alarm condition
-      UNDEFINED_ALARM = 4;	// unknown or undefined alarm condition present
-    }
     DataValue_ValueStatus valueStatus;
     string message;
-    int statusCode;
-    intseverity;
+    DataValue_ValueStatus_StatusCode statusCode = GetStatusCode;
+    DataValue_ValueStatus_Severity severity = GetSeverity;
     return valueStatus;
 }
 
@@ -191,21 +182,14 @@ Structure GetStructure(){
     return structValue;
 }
 
+Image_FileType GetFileType(){
+    Image_FileType fileType;
+    return fileType;
+}
 Image GetImage(){
     Image imageItem;
-    enum FileType {
-    RAW = 0;
-    JPEG = 1;
-    GIF = 2;
-    TIFF = 3;
-    BMP = 4;
-    PNG = 5;
-    EPS = 6;
-    SVG = 7;
-    PDF = 8;
-  }
     byte image;
-    int fileType;
+    Image_FileType fileType = GetFileType;
     return imageItem;
 }
 

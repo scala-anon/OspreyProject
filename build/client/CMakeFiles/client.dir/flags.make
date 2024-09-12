@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DCARES_STATICLIB
 
-CXX_INCLUDES = -I/home/nick/Documents/OspreyProject/build/proto -isystem /home/nick/.local/include
+CXX_INCLUDES = -I/home/nick/Documents/OspreyProject/build/client -I/home/nick/Documents/OspreyProject/proto -I/home/nick/Documents/OspreyProject/build/proto -isystem /home/nick/.local/include
 
 CXX_FLAGS = -std=gnu++17
 

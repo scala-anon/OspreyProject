@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named myproto
+
+# Build rule for target.
+myproto: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 myproto
+.PHONY : myproto
+
+# fast build rule for target.
+myproto/fast:
+	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/myproto.dir/build.make proto/CMakeFiles/myproto.dir/build
+.PHONY : myproto/fast
+
+#=============================================================================
 # Target rules for targets named client
 
 # Build rule for target.
@@ -141,19 +154,6 @@ server: cmake_check_build_system
 server/fast:
 	$(MAKE) $(MAKESILENT) -f server/CMakeFiles/server.dir/build.make server/CMakeFiles/server.dir/build
 .PHONY : server/fast
-
-#=============================================================================
-# Target rules for targets named myproto
-
-# Build rule for target.
-myproto: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 myproto
-.PHONY : myproto
-
-# fast build rule for target.
-myproto/fast:
-	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/myproto.dir/build.make proto/CMakeFiles/myproto.dir/build
-.PHONY : myproto/fast
 
 # Help Target
 help:

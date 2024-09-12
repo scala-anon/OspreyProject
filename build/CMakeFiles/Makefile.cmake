@@ -67,14 +67,14 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "proto/CMakeFiles/CMakeDirectoryInformation.cmake"
   "client/CMakeFiles/CMakeDirectoryInformation.cmake"
   "server/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "proto/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "proto/CMakeFiles/myproto.dir/DependInfo.cmake"
   "client/CMakeFiles/client.dir/DependInfo.cmake"
   "server/CMakeFiles/server.dir/DependInfo.cmake"
-  "proto/CMakeFiles/myproto.dir/DependInfo.cmake"
   )

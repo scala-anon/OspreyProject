@@ -130,6 +130,54 @@ client/fast:
 	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/build
 .PHONY : client/fast
 
+src/DataProcessor.o: src/DataProcessor.cpp.o
+.PHONY : src/DataProcessor.o
+
+# target to build an object file
+src/DataProcessor.cpp.o:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/DataProcessor.cpp.o
+.PHONY : src/DataProcessor.cpp.o
+
+src/DataProcessor.i: src/DataProcessor.cpp.i
+.PHONY : src/DataProcessor.i
+
+# target to preprocess a source file
+src/DataProcessor.cpp.i:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/DataProcessor.cpp.i
+.PHONY : src/DataProcessor.cpp.i
+
+src/DataProcessor.s: src/DataProcessor.cpp.s
+.PHONY : src/DataProcessor.s
+
+# target to generate assembly for a file
+src/DataProcessor.cpp.s:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/DataProcessor.cpp.s
+.PHONY : src/DataProcessor.cpp.s
+
+src/FileReader.o: src/FileReader.cpp.o
+.PHONY : src/FileReader.o
+
+# target to build an object file
+src/FileReader.cpp.o:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/FileReader.cpp.o
+.PHONY : src/FileReader.cpp.o
+
+src/FileReader.i: src/FileReader.cpp.i
+.PHONY : src/FileReader.i
+
+# target to preprocess a source file
+src/FileReader.cpp.i:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/FileReader.cpp.i
+.PHONY : src/FileReader.cpp.i
+
+src/FileReader.s: src/FileReader.cpp.s
+.PHONY : src/FileReader.s
+
+# target to generate assembly for a file
+src/FileReader.cpp.s:
+	cd /home/nick/Documents/OspreyProject/build && $(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/src/FileReader.cpp.s
+.PHONY : src/FileReader.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -163,6 +211,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... client"
+	@echo "... src/DataProcessor.o"
+	@echo "... src/DataProcessor.i"
+	@echo "... src/DataProcessor.s"
+	@echo "... src/FileReader.o"
+	@echo "... src/FileReader.i"
+	@echo "... src/FileReader.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -8,245 +8,233 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <ctime>
 #include <cstdint>
+#include <chrono>
 
 using namespace dp::service::ingestion;
 using namespace google::protobuf::internal;
+using namespace google::protobuf::Message;
+using namespace google::protobuf::Arena;
+using namespace std;
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
 /*
-    create RegisterProviderRequest message
-    message will need providerName, attributes, and requestTime
-    send message to rpc registerProvider this returns RegisterProviderResponse
-    create IngestDataRequest message
-    message will need attributes(optional), clientRequestId, requestTime, eventMetadata(optional), ingestDataFrame, providerId 
-    send message to ingestData this returns IngestDataResponse 
+    DataIngestionRequest
+        ├── Attributes (optional list of key-value pairs)
+        ├── ClientRequest (string)
+        ├── RequestTime
+        │   └── Enum of Timestamp
+        │       ├── Epoch Seconds
+        │       └── Nano Seconds
+        ├── EventMetadata
+        │   └── Enum
+        │       ├── Description (string)
+        │       ├── StartTime
+        │       │   └── Enum of Timestamp
+        │       │       ├── Epoch Seconds
+        │       │       └── Nano Seconds
+        │       └── StopTime
+        │           └── Enum of Timestamp
+        │               ├── Epoch Seconds
+        │               └── Nano Seconds
+        ├── ProviderId (int)
+        └── IngestionDataFrame
+            ├── DataColumn
+            │   └── Strongly Typed Enum
+            │       ├── Name (string)
+            │       └── DataValue
+            │           ├── ValueStatus
+            │           │   └── Strongly Typed Enum
+            │           │       ├── Message
+            │           │       ├── StatusCode
+            │           │       └── Severity
+            │           ├── StringValue
+            │           ├── BooleanValue
+            │           ├── IntValue
+            │           ├── LongValue
+            │           ├── FloatValue
+            │           ├── DoubleValue
+            │           ├── ByteArrayValue
+            │           ├── ArrayValue
+            │           │   └── Enum of DataValues
+            │           ├── StructureValue
+            │           │   └── Enum of Fields
+            │           ├── Image
+            │           │   └── Enum
+            │           │       ├── Image (file name)
+            │           │       └── FileType
+            │           └── TimestampValue
+            │               └── Same Enum as Timestamp
+            └── DataTimestamps
+                └── Enum
+                    ├── SamplingClock
+                    │   └── Enum
+                    │       ├── StartTime
+                    │       │   └── Enum of Timestamp
+                    │       │       ├── Epoch Seconds
+                    │       │       └── Nano Seconds
+                    │       ├── PeriodNano (int)
+                    │       └── CountField (int)
+                    └── TimestampList
+                        └── Enum
+                            └── Timestamps
+                                ├── Epoch Seconds
+                                └── Nano Seconds
 */
+IngestDataRequest GetDataRequest(){
+    // Attributes optional not needed right now
+    string clientRequest = "0001";
+    requestTime = GetTimeStamp;
+    eventMetaData = GetEventMetaData;
+    int providerId = 1;
+    IngestDataRequest_IngestionDataFrame dataFrame = GetIngestionDataFrame;
 
-// This function fills in a register request message based on user input and then returns the message
-RegisterProviderRequest promptForProviderRequest() {
-    RegisterProviderRequest providerRequest;
-    
-    std::cout << "Enter the provider name: ";
-    std::string providerName;
-    std::getline(std::cin, providerName);
+}
 
-    if (!providerName.empty()) {
-        providerRequest.set_providername(providerName);
+
+EventMetadata GetEventMetaData(){
+    EventMetadata metaData;
+    string description; 
+    startTime = GetTimeStamp;
+    stopTime = GetTimeStamp;
+    return metaData;
+}
+
+IngestDataRequest_IngestionDataFrame GetIngestionDataFrame(){
+    IngestDataRequest_IngestionDataFrame dataFrame;
+    DataColumn dataColumn = GetDataColumn;
+    DataTimestamps dataTimeStamps = GetDataTimeStamps;
+    return dataFrame;
+}
+
+DataColumn GetDataColumn(){
+    DataColumn dataColumn;
+    string name = "dataType";
+    int columnLen = 1000;
+    for(int i = 0; i < 1000; i++){
+        DataValue dataValue = GetDataValue();
+        dataValue.set_name(name);
+        *dataColumn.add_datavalues() = dataValue;
     }
-    // add section for attributes (if needed)
-
-    auto now = std::chrono::system_clock::now();
-    auto now_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    providerRequest.set_requesttime(now_nano);
-
-    return providerRequest;
+    return dataColumn;
 }
 
-void callRegisterProviderRpc(ClientContext& context, 
-                             std::shared_ptr<DpIngestionService::Stub> stub) {
-    // Create and populate the request message
-    RegisterProviderRequest request = promptForProviderRequest();
-    
-    // Create the response message
-    RegisterProviderResponse response;
-    
-    // Make the RPC call
-    Status status = stub->RegisterProvider(&context, request, &response);
-    
-    // Handle the response
-    if (status.ok()) {
-        std::cout << "RPC succeeded" << std::endl;
-        // Process the response if needed
-    } else {
-        std::cerr << "RPC failed: " << status.error_message() << std::endl;
+DataTimestamps GetDataTimeStamps(){
+    DataTimestamps timeStamps;
+    SamplingClock samplingClock = GetSamplingClock;
+    TimestampList timeStampList = GetTimeStampList;
+    return timeStamps;
+}
+
+DataValue GetDataValue(){
+    // add section that reads from file
+    DataValue dataValue;
+    DataValue_ValueStatus valueStatus = GetValueStatus;
+    // add conditional statement to check if valuestatus is valid 
+    /*
+    switch(dataValue.type()){
+    CASE String:
+        string stringValue = data;
+    CASE Boolean:
+        boolean booleanValue = data; 
+    CASE Int:
+        Integer IntValue = data;
+    CASE Long:
+        long longValue = data;
+    CASE float:
+        float floatValue = data;
+    CASE double:
+        double doubleValue = data;
+    CASE Bytearray:
+        ByteArray byteArrayValue = data;
+    CASE Array:
+        Array arrayValue = GetArray;
+    CASE Struct:
+        Structure structureValue = GetStructure;
+    CASE image:
+        Image imageValue = GetImage;
+    CASE timestamp:
+        timeStampValue = GetTimeStamp;
     }
+    */
+    return dataValue;
 }
 
-// This function fills in an ingest data request message based on user input and then returns the message
-IngestDataRequest promptForIngestData() {
-    IngestDataRequest DataRequest;
-    
-    // sets providerId 
-    uint32_t providerIdVal = 1;
-    DataRequest.set_providerid(providerIdVal);
-    
-    // sets clientRequestId 
-    std::string fileName = "counter.txt";
-    int counter = 1;
-
-    std::ifstream infile(fileName);
-    if(infile.is_open()){
-        infile >> counter;
-        infile.close();
-    }
-    counter++;
-    std::stringstream ss;
-    ss << std::setw(4) << std::setfill('0') << counter;
-    std::string counterStr = ss.str();
-    
-    DataRequest.set_clientrequestid(counterStr);
-    
-    std::ofstream outfile(filename);
-    if (outfile.is_open()) {
-        outfile << counter;
-        outfile.close();
-    }
-
-
-    // sets requestTime 
-    auto now = std::chrono::system_clock::now();
-    auto now_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    DataRequest.set_requesttime(now_nano);
-
-    // sets dataFrame 
-    IngestDataRequest_IngestionDataFrame dataFrame = promptForIngestionDataFrame();
-    DataRequest.set_ingestiondataframe(dataFrame);
-
-    return DataRequest;
+DataValue_ValueStatus_StatusCode GetStatusCode(){
+    DataValue_ValueStatus_StatusCode statusCode;
+    return statusCode
+}
+DataValue_ValueStatus_Severity GetSeverity(){
+    DataValue_ValueStatus_Severity severity;
+    return severity;
+}
+DataValue_ValueStatus GetValueStatus(){
+    DataValue_ValueStatus valueStatus;
+    string message;
+    DataValue_ValueStatus_StatusCode statusCode = GetStatusCode;
+    DataValue_ValueStatus_Severity severity = GetSeverity;
+    return valueStatus;
 }
 
-IngestDataRequest_IngestionDataFrame promptForIngestionDataFrame() {
-    IngestDataRequest_IngestionDataFrame DataFrame;
-
-    // gets requestTime value
-    auto now = std::chrono::system_clock::now();
-    auto now_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-    DataFrame.set_requesttime(now_nano);
-
-    // add section for DataColumn
-
-    return DataFrame;
+Array GetArray(){
+    Array array;
+    DataValue dataValue = GetDataValue;
+    return array;
 }
 
-DataTimestamps SetDataTimeStamps(){
-    DataTimestamps dataTimeStamp;
-    SamplingClock clock = SetSamplingClock();
-
-    // sets samplingclock
-    dataTimeStamp.set_allocated_samplingclock(clock);
-
-    //TODO add set method for timestamplist
+SamplingClock GetSamplingClock(){
+    SamplingClock samplingClock;
+    startTime = GetTimeStamp;
+    int periodNano; // needs to be in nanoseconds
+    int countField;
+    return samplingClock;
 }
 
-SamplingClock SetSamplingClock(){
-    SamplingClock clock;
-    TimeStamp time = SetTimeStamp;
-    std::string fileName = "";
-    std::vector<uint64_t> periodNano = measureLineReadTime(fileName);
-
-    //TODO make method that will read the number of samples in the contained interval   
-    uint32_t counter = 3;
-    
-    // set startTime
-    clock.set_allocated_starttime(time);
-
-    // set periodNanos
-    for(uint64_t number : periodNano){
-        clock.set_periodnanos(number);
-    }
-
-    // set count
-    clock.set_count(counter);
-    return(clock);
+TimestampList GetTimeStampList(){
+    TimestampList stampList;
+    timeStamp = GetTimeStamp;
+    return stampList;
 }
 
-Timestamp SetTimeStamp(){
-    Timestamp clock;
-    // Get the current time point
-    uint64_t now = std::chrono::system_clock::now();
-
-    // Get the number of seconds since the Unix epoch
-    uint64_t epoch_seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
-
-    // Get the number of nanoseconds since the Unix epoch
-    uint64_t epoch_nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
-
-    // Calculate the number of nanoseconds within the current second
-    uint64_t nanoseconds_within_second = epoch_nanoseconds - (epoch_seconds * 1000000000LL);
-    
-    time.set_epochseconds(epoch_seconds);
-    time.set_nanoseconds(nanoseconds_within_second);
-    return(time);
+Structure GetStructure(){
+    Structure structValue;
+    Structure_Field fields = GetField;
+    return structValue;
 }
 
-std::vector<uint64_t> measureLineReadTime(const std::string& filename) {
-    // Open the file
-    std::ifstream file(filename);
-    std::vector<uint64_t> lineReadTimes;
-
-    if (!file.is_open()) {
-        std::cerr << "Could not open the file: " << filename << std::endl;
-        return lineReadTimes;  // Return an empty vector if the file couldn't be opened
-    }
-
-    std::string line;
-
-    // Read each line and measure the time taken
-    while (std::getline(file, line)) {
-        // Start time
-        auto start = std::chrono::high_resolution_clock::now();
-
-        // Here we simulate reading the line, but it's already read by std::getline
-        // Do any additional processing with the line here if necessary
-
-        // End time
-        auto end = std::chrono::high_resolution_clock::now();
-
-        // Calculate the time taken in nanoseconds
-        uint64_t periodNanos = static_cast<uint64_t>(
-            std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
-        );
-
-        // Store the time taken for this line
-        lineReadTimes.push_back(periodNanos);
-    }
-
-    file.close();
-    return lineReadTimes;  // Return the vector of times
+Image_FileType GetFileType(){
+    Image_FileType fileType;
+    return fileType;
+}
+Image GetImage(){
+    Image imageItem;
+    byte image;
+    Image_FileType fileType = GetFileType;
+    return imageItem;
 }
 
-DataColumn SetDataColumn(){
-    DataColumn column;
-    
+Structure_Field GetField(){
+    Structure_Field field;
+    string name;
+    DataValue value = GetDataValue;
+    return field;
 }
 
+Timestamp GetTimeStamp(){
+    Timestamp Time;
+    Time.clear_epochseconds();
+    Time.clear_nanoseconds();
+    uint64_t epochSec = chrono::duration_cast< epochseconds > (chrono::system_clock::now().time_since_epoch());
+    uint64_t nanoSec chrono::duration_cast< nanoseconds > (chrono::system_clock::now().time_since_epoch());
+    Time.set_epochseconds(epochSec);
+    Time.set_nanoseconds(nanoSec);
 
-void callIngestDataRpc(ClientContext& context, 
-                      std::shared_ptr<DpIngestionService::Stub> stub) {
-    // Create and populate the request message
-    IngestDataRequest request = promptForIngestData();
-    
-    // Create the response message
-    IngestDataResponse response;
-    
-    // Make the RPC call
-    Status status = stub->IngestData(&context, request, &response);
-    
-    // Handle the response
-    if (status.ok()) {
-        std::cout << "RPC succeeded" << std::endl;
-        // Process the response if needed
-    } else {
-        std::cerr << "RPC failed: " << status.error_message() << std::endl;
-    }
+    return time;
 }
 
-int main(int argc, char* argv[])
-{
-    auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
-    auto stub = DpIngestionService::NewStub(channel);
-
-    // Set up the gRPC client context
-    ClientContext context;
+int main() {
     
-    // Call the RPC methods
-    callRegisterProviderRpc(context, stub);
-    callIngestDataRpc(context, stub);
-
-    return 0;
 }

@@ -83,14 +83,46 @@ client/CMakeFiles/client.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/src/main.cpp.s"
 	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nick/Documents/OspreyProject/client/src/main.cpp -o CMakeFiles/client.dir/src/main.cpp.s
 
+client/CMakeFiles/client.dir/src/DataProcessor.cpp.o: client/CMakeFiles/client.dir/flags.make
+client/CMakeFiles/client.dir/src/DataProcessor.cpp.o: /home/nick/Documents/OspreyProject/client/src/DataProcessor.cpp
+client/CMakeFiles/client.dir/src/DataProcessor.cpp.o: client/CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nick/Documents/OspreyProject/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object client/CMakeFiles/client.dir/src/DataProcessor.cpp.o"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT client/CMakeFiles/client.dir/src/DataProcessor.cpp.o -MF CMakeFiles/client.dir/src/DataProcessor.cpp.o.d -o CMakeFiles/client.dir/src/DataProcessor.cpp.o -c /home/nick/Documents/OspreyProject/client/src/DataProcessor.cpp
+
+client/CMakeFiles/client.dir/src/DataProcessor.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/src/DataProcessor.cpp.i"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nick/Documents/OspreyProject/client/src/DataProcessor.cpp > CMakeFiles/client.dir/src/DataProcessor.cpp.i
+
+client/CMakeFiles/client.dir/src/DataProcessor.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/src/DataProcessor.cpp.s"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nick/Documents/OspreyProject/client/src/DataProcessor.cpp -o CMakeFiles/client.dir/src/DataProcessor.cpp.s
+
+client/CMakeFiles/client.dir/src/FileReader.cpp.o: client/CMakeFiles/client.dir/flags.make
+client/CMakeFiles/client.dir/src/FileReader.cpp.o: /home/nick/Documents/OspreyProject/client/src/FileReader.cpp
+client/CMakeFiles/client.dir/src/FileReader.cpp.o: client/CMakeFiles/client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nick/Documents/OspreyProject/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object client/CMakeFiles/client.dir/src/FileReader.cpp.o"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT client/CMakeFiles/client.dir/src/FileReader.cpp.o -MF CMakeFiles/client.dir/src/FileReader.cpp.o.d -o CMakeFiles/client.dir/src/FileReader.cpp.o -c /home/nick/Documents/OspreyProject/client/src/FileReader.cpp
+
+client/CMakeFiles/client.dir/src/FileReader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/client.dir/src/FileReader.cpp.i"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nick/Documents/OspreyProject/client/src/FileReader.cpp > CMakeFiles/client.dir/src/FileReader.cpp.i
+
+client/CMakeFiles/client.dir/src/FileReader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/client.dir/src/FileReader.cpp.s"
+	cd /home/nick/Documents/OspreyProject/build/client && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nick/Documents/OspreyProject/client/src/FileReader.cpp -o CMakeFiles/client.dir/src/FileReader.cpp.s
+
 # Object files for target client
 client_OBJECTS = \
-"CMakeFiles/client.dir/src/main.cpp.o"
+"CMakeFiles/client.dir/src/main.cpp.o" \
+"CMakeFiles/client.dir/src/DataProcessor.cpp.o" \
+"CMakeFiles/client.dir/src/FileReader.cpp.o"
 
 # External object files for target client
 client_EXTERNAL_OBJECTS =
 
 client/client: client/CMakeFiles/client.dir/src/main.cpp.o
+client/client: client/CMakeFiles/client.dir/src/DataProcessor.cpp.o
+client/client: client/CMakeFiles/client.dir/src/FileReader.cpp.o
 client/client: client/CMakeFiles/client.dir/build.make
 client/client: proto/libmyproto.a
 client/client: /home/nick/.local/lib/libgrpc++.a
@@ -187,7 +219,7 @@ client/client: /home/nick/.local/lib/libssl.a
 client/client: /home/nick/.local/lib/libcrypto.a
 client/client: /home/nick/.local/lib/libaddress_sorting.a
 client/client: client/CMakeFiles/client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/nick/Documents/OspreyProject/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/nick/Documents/OspreyProject/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable client"
 	cd /home/nick/Documents/OspreyProject/build/client && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/client.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

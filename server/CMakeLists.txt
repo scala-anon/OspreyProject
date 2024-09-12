@@ -21,3 +21,4 @@ target_link_libraries(server
     PRIVATE
         myproto
 )
+target_include_directories(server PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

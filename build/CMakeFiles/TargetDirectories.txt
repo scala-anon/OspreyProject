@@ -1,11 +1,11 @@
 /home/nick/Documents/OspreyProject/build/CMakeFiles/edit_cache.dir
 /home/nick/Documents/OspreyProject/build/CMakeFiles/rebuild_cache.dir
+/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/myproto.dir
+/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/edit_cache.dir
+/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/rebuild_cache.dir
 /home/nick/Documents/OspreyProject/build/client/CMakeFiles/client.dir
 /home/nick/Documents/OspreyProject/build/client/CMakeFiles/edit_cache.dir
 /home/nick/Documents/OspreyProject/build/client/CMakeFiles/rebuild_cache.dir
 /home/nick/Documents/OspreyProject/build/server/CMakeFiles/server.dir
 /home/nick/Documents/OspreyProject/build/server/CMakeFiles/edit_cache.dir
 /home/nick/Documents/OspreyProject/build/server/CMakeFiles/rebuild_cache.dir
-/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/myproto.dir
-/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/edit_cache.dir
-/home/nick/Documents/OspreyProject/build/proto/CMakeFiles/rebuild_cache.dir

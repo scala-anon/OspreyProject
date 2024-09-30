@@ -1,118 +1,62 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <cstdint>
-#include <cstring>
-#include <ctime>
+#include <iomanip>  // For formatting
+#include <cstdint>  // For fixed-width integer types like uint32_t, etc.
 
-#pragma pack(push, 1)
+#pragma pack(push, 1)  // Disable padding to ensure structure matches binary format
 
-// Body structure for MSGID 1
-struct BodyType1 {
-    uint32_t channelData[32];  // 32 channels of 32-bit unsigned integers
+struct Packet {
+    char magic[2];         // "P" and "S" (2 bytes)
+    uint16_t msgID;        // Message ID (2 bytes)
+    uint32_t bodyLength;   // Body length (4 bytes)
+    uint32_t seconds;      // POSIX timestamp seconds (4 bytes)
+    uint32_t nanoseconds;  // Nanoseconds (4 bytes)
+    // The body bytes will be read separately as their size is variable
 };
 
-// Body structure for MSGID 2
-struct BodyType2 {
-    float signalStrength[32];  // 32 channels of floats for signal strength
-};
-
-#pragma pack(pop)
-
-// PSC Header structure with updated format
-#pragma pack(push, 1)
-struct PSCHeader {
-    char magic[2];          // 'P', 'S' (2 bytes)
-    uint16_t msgID;         // Message ID (2 bytes)
-    uint32_t bodyLength;    // Body length (4 bytes)
-    uint32_t seconds;       // POSIX timestamp (4 bytes)
-    uint32_t nanoseconds;   // Nanoseconds (4 bytes)
-};
-#pragma pack(pop)
-
-// Body structure for dynamic processing
-void interpretBody(const PSCHeader& header, const std::vector<char>& bodyData) {
-    if (header.msgID == 1) {
-        // Interpret the body as BodyType1
-        BodyType1 body;
-        std::memcpy(&body, bodyData.data(), sizeof(BodyType1));
-        
-        // Process the data from BodyType1
-        std::cout << "Processing BodyType1 data (MSGID 1):" << std::endl;
-        for (int i = 0; i < 32; ++i) {
-            std::cout << "Channel " << i << ": " << body.channelData[i] << std::endl;
-        }
-    }
-    else if (header.msgID == 2) {
-        // Interpret the body as BodyType2
-        BodyType2 body;
-        std::memcpy(&body, bodyData.data(), sizeof(BodyType2));
-
-        // Process the data from BodyType2
-        std::cout << "Processing BodyType2 data (MSGID 2):" << std::endl;
-        for (int i = 0; i < 32; ++i) {
-            std::cout << "Signal Strength " << i << ": " << body.signalStrength[i] << std::endl;
-        }
-    }
-    else {
-        // Unknown MSGID
-        std::cerr << "Unknown MSGID: " << header.msgID << std::endl;
-    }
-}
-
-void readPSCFile(const std::string& fileName) {
-    std::ifstream file(fileName, std::ios::binary);
-    
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file: " << fileName << std::endl;
-        return;
-    }
-
-    // Loop through the file, reading each header and body
-    while (file) {
-        PSCHeader header;
-
-        // Read the header
-        file.read(reinterpret_cast<char*>(&header), sizeof(PSCHeader));
-
-        // Check if the file still has data to process
-        if (!file) {
-            break;  // End of file or error reading header
-        }
-
-        // Ensure the header starts with 'P' and 'S'
-        if (header.magic[0] != 'P' || header.magic[1] != 'S') {
-            std::cerr << "Invalid PSC Header Magic!" << std::endl;
-            break;
-        }
-
-        // Convert the POSIX timestamp to a readable format
-        std::time_t posix_time = static_cast<std::time_t>(header.seconds);
-        std::tm* timeInfo = std::gmtime(&posix_time);
-        char timeString[32];
-        std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", timeInfo);
-
-        // Output timestamp information
-        std::cout << "Message received at: " << timeString << "." << header.nanoseconds << " UTC" << std::endl;
-
-        // Read the body data based on the body length in the header
-        std::vector<char> bodyData(header.bodyLength);
-        file.read(bodyData.data(), header.bodyLength);
-
-        if (!file) {
-            std::cerr << "Error: Could not read body data!" << std::endl;
-            break;
-        }
-
-        // Dynamically process the body based on the MSGID
-        interpretBody(header, bodyData);
-    }
-
-    file.close();
-}
+#pragma pack(pop)  // Re-enable normal padding
 
 int main() {
-    // Test the file reading and processing
-    readPSCFile("/home/niko/Documents/OspreyProject-1/mic1-8-20240511/mic1-8-CH17-20240511-121442.dat");
+    std::ifstream inFile("/home/nick/Documents/data/mic1-8-CH17-20240511-121442.dat", std::ios::binary);
+    std::ofstream outFile("output.txt");
+
+    if (!inFile) {
+        std::cerr << "Unable to open the file!" << std::endl;
+        return 1;
+    }
+
+    Packet packet;
+    while (inFile.read(reinterpret_cast<char*>(&packet), sizeof(Packet))) {
+        // Convert binary data to text
+        outFile << "Magic: " << packet.magic[0] << packet.magic[1] << "\n";
+        outFile << "Message ID: " << packet.msgID << "\n";
+        outFile << "Body Length: " << packet.bodyLength << "\n";
+        outFile << "Seconds (POSIX Epoch): " << packet.seconds << "\n";
+        outFile << "Nanoseconds: " << packet.nanoseconds << "\n";
+
+        // Now, read the body bytes if there are any
+        if (packet.bodyLength > 0) {
+            char* bodyData = new char[packet.bodyLength];
+            inFile.read(bodyData, packet.bodyLength);
+
+            // Write body bytes as hex or ASCII
+            outFile << "Body Bytes (hex): ";
+            for (uint32_t i = 0; i < packet.bodyLength; ++i) {
+                outFile << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)bodyData[i] << " ";
+            }
+            outFile << "\n";
+
+            delete[] bodyData;
+        }
+        outFile << "---------------------------\n";  // Separator between packets
+    }
+
+    inFile.close();
+    outFile.close();
+
+    std::cout << "Binary file converted to text successfully!" << std::endl;
+
     return 0;
 }
+
+

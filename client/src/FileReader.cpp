@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iomanip>  // For formatting
 #include <cstdint>  // For fixed-width integer types like uint32_t, etc.
+#include <endian.h> // For byte order conversion functions
+#include <vector>   // For std::vector
 
 #pragma pack(push, 1)  // Disable padding to ensure structure matches binary format
 
@@ -26,7 +28,23 @@ int main() {
     }
 
     Packet packet;
+    int packetCount = 0;  // Packet counter
+
     while (inFile.read(reinterpret_cast<char*>(&packet), sizeof(Packet))) {
+        // Check magic bytes
+        if (packet.magic[0] != 'P' || packet.magic[1] != 'S') {
+            std::cerr << "Invalid magic bytes at packet " << packetCount << std::endl;
+            return 1;
+        }
+
+        // Convert fields from big-endian to host byte order
+        packet.msgID = be16toh(packet.msgID);
+        packet.bodyLength = be32toh(packet.bodyLength);
+        packet.seconds = be32toh(packet.seconds);
+        packet.nanoseconds = be32toh(packet.nanoseconds);
+
+        packetCount++;  // Increment the packet counter
+
         // Convert binary data to text
         outFile << "Magic: " << packet.magic[0] << packet.magic[1] << "\n";
         outFile << "Message ID: " << packet.msgID << "\n";
@@ -36,8 +54,12 @@ int main() {
 
         // Now, read the body bytes if there are any
         if (packet.bodyLength > 0) {
-            char* bodyData = new char[packet.bodyLength];
-            inFile.read(bodyData, packet.bodyLength);
+            // Use std::vector instead of new[]
+            std::vector<char> bodyData(packet.bodyLength);
+            if (!inFile.read(bodyData.data(), packet.bodyLength)) {
+                std::cerr << "Error reading body data." << std::endl;
+                return 1;
+            }
 
             // Write body bytes as hex or ASCII
             outFile << "Body Bytes (hex): ";
@@ -45,8 +67,6 @@ int main() {
                 outFile << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)bodyData[i] << " ";
             }
             outFile << "\n";
-
-            delete[] bodyData;
         }
         outFile << "---------------------------\n";  // Separator between packets
     }
@@ -55,8 +75,6 @@ int main() {
     outFile.close();
 
     std::cout << "Binary file converted to text successfully!" << std::endl;
-
+    std::cout << "Total number of packets: " << packetCount << std::endl;
     return 0;
 }
-
-

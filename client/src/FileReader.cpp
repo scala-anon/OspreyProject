@@ -19,8 +19,8 @@ struct Packet {
 #pragma pack(pop)  // Re-enable normal padding
 
 int main() {
-    std::ifstream inFile("/home/nick/Documents/data/mic1-8-CH17-20240511-121442.dat", std::ios::binary);
-    std::ofstream outFile("output.txt");
+    std::ifstream inFile("/home/nicholas/Documents/mic1-8-20240511/mic1-8-CH17-20240511-121442.dat", std::ios::binary);
+    std::ofstream outFile("/home/nicholas/Documents/ReformattedFiles/output.txt");
 
     if (!inFile) {
         std::cerr << "Unable to open the file!" << std::endl;
@@ -45,28 +45,43 @@ int main() {
 
         packetCount++;  // Increment the packet counter
 
-        // Convert binary data to text
+        // Output packet header information
+        outFile << "Packet #" << packetCount << "\n";
         outFile << "Magic: " << packet.magic[0] << packet.magic[1] << "\n";
         outFile << "Message ID: " << packet.msgID << "\n";
         outFile << "Body Length: " << packet.bodyLength << "\n";
-        outFile << "Seconds (POSIX Epoch): " << packet.seconds << "\n";
+        outFile << "Seconds: " << packet.seconds << "\n";
         outFile << "Nanoseconds: " << packet.nanoseconds << "\n";
 
-        // Now, read the body bytes if there are any
+        // Process body bytes if present
         if (packet.bodyLength > 0) {
-            // Use std::vector instead of new[]
             std::vector<char> bodyData(packet.bodyLength);
             if (!inFile.read(bodyData.data(), packet.bodyLength)) {
                 std::cerr << "Error reading body data." << std::endl;
                 return 1;
             }
 
-            // Write body bytes as hex or ASCII
-            outFile << "Body Bytes (hex): ";
-            for (uint32_t i = 0; i < packet.bodyLength; ++i) {
-                outFile << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)bodyData[i] << " ";
+            // Interpret body as ADC values if msgID is known
+            if (packet.msgID == 20033 || packet.msgID == 20034) {
+                outFile << "ADC Values: ";
+
+                bool first = true;
+                for (size_t i = 0; i + 3 <= packet.bodyLength; i += 3) {
+                    int32_t adcValue = ((bodyData[i] << 16) | (bodyData[i + 1] << 8) | bodyData[i + 2]);
+                    // Sign extend if needed for 24-bit signed integers
+                    if (adcValue & 0x800000) {
+                        adcValue |= ~0xFFFFFF;
+                    }
+
+                    // Output ADC values in comma-separated format
+                    if (!first) {
+                        outFile << ", ";
+                    }
+                    outFile << adcValue;
+                    first = false;
+                }
+                outFile << "\n";
             }
-            outFile << "\n";
         }
         outFile << "---------------------------\n";  // Separator between packets
     }

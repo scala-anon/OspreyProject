@@ -1,0 +1,33 @@
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - image: ubuntu:latest
+        - image: debian:latest
+
+    steps:
+    - name: System setup
+      shell: bash
+      run: |
+        apt-get update
+        apt-get -y install build-essential cmake libprotobuf-dev libgrpc++-dev protobuf-compiler-grpc
+    - uses: actions/checkout@v4
+    - name: Versions
+      shell: bash
+      run: |
+        set -x
+        g++ --version
+        cmake --version
+    - name: listing
+      run: dpkg -L libgrpc-dev
+    - name: Configure
+      run: cmake -S . -B build
+    - name: Build
+      run: cmake --build build -j2 -v

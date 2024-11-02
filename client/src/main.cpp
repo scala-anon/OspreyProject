@@ -2,6 +2,8 @@
 #include <ingestion.grpc.pb.h>
 #include <common.pb.h>
 
+#include <google/protobuf/message.h>
+#include <google/protobuf/arena.h>
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
@@ -12,9 +14,8 @@
 #include <chrono>
 
 using namespace dp::service::ingestion;
-using namespace google::protobuf::internal;
-using namespace google::protobuf::Message;
-using namespace google::protobuf::Arena;
+using google::protobuf::Message;
+using google::protobuf::Arena;
 using namespace std;
 
 using grpc::Channel;

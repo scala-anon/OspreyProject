@@ -1,9 +1,4 @@
 #
-# Dependencies
-#
-find_package(Threads)
-
-#
 # Sources
 #
 set(SOURCES

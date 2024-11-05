@@ -99,7 +99,7 @@ client/clean: client/CMakeFiles/client.dir/clean
 # Directory level rules for directory proto
 
 # Recursive "all" directory target.
-proto/all: proto/CMakeFiles/proto.dir/all
+proto/all: proto/CMakeFiles/ProtoFiles.dir/all
 .PHONY : proto/all
 
 # Recursive "preinstall" directory target.
@@ -107,7 +107,7 @@ proto/preinstall:
 .PHONY : proto/preinstall
 
 # Recursive "clean" directory target.
-proto/clean: proto/CMakeFiles/proto.dir/clean
+proto/clean: proto/CMakeFiles/ProtoFiles.dir/clean
 .PHONY : proto/clean
 
 #=============================================================================
@@ -126,30 +126,30 @@ server/clean: server/CMakeFiles/server.dir/clean
 .PHONY : server/clean
 
 #=============================================================================
-# Target rules for target proto/CMakeFiles/proto.dir
+# Target rules for target proto/CMakeFiles/ProtoFiles.dir
 
 # All Build rule for target.
-proto/CMakeFiles/proto.dir/all:
-	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/depend
-	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=4,5,6,7,8,9,10,11,12 "Built target proto"
-.PHONY : proto/CMakeFiles/proto.dir/all
+proto/CMakeFiles/ProtoFiles.dir/all:
+	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/depend
+	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Built target ProtoFiles"
+.PHONY : proto/CMakeFiles/ProtoFiles.dir/all
 
 # Build rule for subdir invocation for target.
-proto/CMakeFiles/proto.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 9
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 proto/CMakeFiles/proto.dir/all
+proto/CMakeFiles/ProtoFiles.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 7
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 proto/CMakeFiles/ProtoFiles.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 0
-.PHONY : proto/CMakeFiles/proto.dir/rule
+.PHONY : proto/CMakeFiles/ProtoFiles.dir/rule
 
 # Convenience name for target.
-proto: proto/CMakeFiles/proto.dir/rule
-.PHONY : proto
+ProtoFiles: proto/CMakeFiles/ProtoFiles.dir/rule
+.PHONY : ProtoFiles
 
 # clean rule for target.
-proto/CMakeFiles/proto.dir/clean:
-	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/clean
-.PHONY : proto/CMakeFiles/proto.dir/clean
+proto/CMakeFiles/ProtoFiles.dir/clean:
+	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/clean
+.PHONY : proto/CMakeFiles/ProtoFiles.dir/clean
 
 #=============================================================================
 # Target rules for target client/CMakeFiles/client.dir
@@ -158,7 +158,7 @@ proto/CMakeFiles/proto.dir/clean:
 client/CMakeFiles/client.dir/all:
 	$(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/depend
 	$(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=1,2,3 "Built target client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=8,9,10 "Built target client"
 .PHONY : client/CMakeFiles/client.dir/all
 
 # Build rule for subdir invocation for target.
@@ -184,7 +184,7 @@ client/CMakeFiles/client.dir/clean:
 server/CMakeFiles/server.dir/all:
 	$(MAKE) $(MAKESILENT) -f server/CMakeFiles/server.dir/build.make server/CMakeFiles/server.dir/depend
 	$(MAKE) $(MAKESILENT) -f server/CMakeFiles/server.dir/build.make server/CMakeFiles/server.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=13,14 "Built target server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=11,12 "Built target server"
 .PHONY : server/CMakeFiles/server.dir/all
 
 # Build rule for subdir invocation for target.

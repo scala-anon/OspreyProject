@@ -117,25 +117,25 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-proto/CMakeFiles/proto.dir/rule:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 proto/CMakeFiles/proto.dir/rule
-.PHONY : proto/CMakeFiles/proto.dir/rule
+proto/CMakeFiles/ProtoFiles.dir/rule:
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 proto/CMakeFiles/ProtoFiles.dir/rule
+.PHONY : proto/CMakeFiles/ProtoFiles.dir/rule
 
 # Convenience name for target.
-proto: proto/CMakeFiles/proto.dir/rule
-.PHONY : proto
+ProtoFiles: proto/CMakeFiles/ProtoFiles.dir/rule
+.PHONY : ProtoFiles
 
 # fast build rule for target.
-proto/fast:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/build
-.PHONY : proto/fast
+ProtoFiles/fast:
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/build
+.PHONY : ProtoFiles/fast
 
 common.grpc.pb.o: common.grpc.pb.cc.o
 .PHONY : common.grpc.pb.o
 
 # target to build an object file
 common.grpc.pb.cc.o:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.grpc.pb.cc.o
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.grpc.pb.cc.o
 .PHONY : common.grpc.pb.cc.o
 
 common.grpc.pb.i: common.grpc.pb.cc.i
@@ -143,7 +143,7 @@ common.grpc.pb.i: common.grpc.pb.cc.i
 
 # target to preprocess a source file
 common.grpc.pb.cc.i:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.grpc.pb.cc.i
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.grpc.pb.cc.i
 .PHONY : common.grpc.pb.cc.i
 
 common.grpc.pb.s: common.grpc.pb.cc.s
@@ -151,7 +151,7 @@ common.grpc.pb.s: common.grpc.pb.cc.s
 
 # target to generate assembly for a file
 common.grpc.pb.cc.s:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.grpc.pb.cc.s
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.grpc.pb.cc.s
 .PHONY : common.grpc.pb.cc.s
 
 common.pb.o: common.pb.cc.o
@@ -159,7 +159,7 @@ common.pb.o: common.pb.cc.o
 
 # target to build an object file
 common.pb.cc.o:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.pb.cc.o
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.pb.cc.o
 .PHONY : common.pb.cc.o
 
 common.pb.i: common.pb.cc.i
@@ -167,7 +167,7 @@ common.pb.i: common.pb.cc.i
 
 # target to preprocess a source file
 common.pb.cc.i:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.pb.cc.i
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.pb.cc.i
 .PHONY : common.pb.cc.i
 
 common.pb.s: common.pb.cc.s
@@ -175,7 +175,7 @@ common.pb.s: common.pb.cc.s
 
 # target to generate assembly for a file
 common.pb.cc.s:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/common.pb.cc.s
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/common.pb.cc.s
 .PHONY : common.pb.cc.s
 
 ingestion.grpc.pb.o: ingestion.grpc.pb.cc.o
@@ -183,7 +183,7 @@ ingestion.grpc.pb.o: ingestion.grpc.pb.cc.o
 
 # target to build an object file
 ingestion.grpc.pb.cc.o:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.grpc.pb.cc.o
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.grpc.pb.cc.o
 .PHONY : ingestion.grpc.pb.cc.o
 
 ingestion.grpc.pb.i: ingestion.grpc.pb.cc.i
@@ -191,7 +191,7 @@ ingestion.grpc.pb.i: ingestion.grpc.pb.cc.i
 
 # target to preprocess a source file
 ingestion.grpc.pb.cc.i:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.grpc.pb.cc.i
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.grpc.pb.cc.i
 .PHONY : ingestion.grpc.pb.cc.i
 
 ingestion.grpc.pb.s: ingestion.grpc.pb.cc.s
@@ -199,7 +199,7 @@ ingestion.grpc.pb.s: ingestion.grpc.pb.cc.s
 
 # target to generate assembly for a file
 ingestion.grpc.pb.cc.s:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.grpc.pb.cc.s
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.grpc.pb.cc.s
 .PHONY : ingestion.grpc.pb.cc.s
 
 ingestion.pb.o: ingestion.pb.cc.o
@@ -207,7 +207,7 @@ ingestion.pb.o: ingestion.pb.cc.o
 
 # target to build an object file
 ingestion.pb.cc.o:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.pb.cc.o
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.pb.cc.o
 .PHONY : ingestion.pb.cc.o
 
 ingestion.pb.i: ingestion.pb.cc.i
@@ -215,7 +215,7 @@ ingestion.pb.i: ingestion.pb.cc.i
 
 # target to preprocess a source file
 ingestion.pb.cc.i:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.pb.cc.i
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.pb.cc.i
 .PHONY : ingestion.pb.cc.i
 
 ingestion.pb.s: ingestion.pb.cc.s
@@ -223,7 +223,7 @@ ingestion.pb.s: ingestion.pb.cc.s
 
 # target to generate assembly for a file
 ingestion.pb.cc.s:
-	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/ingestion.pb.cc.s
+	cd /home/nicholas/OspreyProject/build && $(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/ingestion.pb.cc.s
 .PHONY : ingestion.pb.cc.s
 
 # Help Target
@@ -234,7 +234,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... proto"
+	@echo "... ProtoFiles"
 	@echo "... common.grpc.pb.o"
 	@echo "... common.grpc.pb.i"
 	@echo "... common.grpc.pb.s"

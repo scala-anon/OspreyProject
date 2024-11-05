@@ -117,17 +117,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named proto
+# Target rules for targets named ProtoFiles
 
 # Build rule for target.
-proto: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 proto
-.PHONY : proto
+ProtoFiles: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ProtoFiles
+.PHONY : ProtoFiles
 
 # fast build rule for target.
-proto/fast:
-	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/proto.dir/build.make proto/CMakeFiles/proto.dir/build
-.PHONY : proto/fast
+ProtoFiles/fast:
+	$(MAKE) $(MAKESILENT) -f proto/CMakeFiles/ProtoFiles.dir/build.make proto/CMakeFiles/ProtoFiles.dir/build
+.PHONY : ProtoFiles/fast
 
 #=============================================================================
 # Target rules for targets named client
@@ -163,8 +163,8 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... ProtoFiles"
 	@echo "... client"
-	@echo "... proto"
 	@echo "... server"
 .PHONY : help
 

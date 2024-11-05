@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/client.dir/src/main.cpp.o CMakeFiles/client.dir/src/FileReader.cpp.o -o client  -lmyproto 
+/usr/bin/c++ CMakeFiles/client.dir/src/main.cpp.o CMakeFiles/client.dir/src/FileReader.cpp.o -o client  -lproto 

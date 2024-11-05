@@ -5,7 +5,7 @@ set(PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}") # Directory where your .proto files
 set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/proto")  # Directory for generated files
 
 # Include directories for generated files
-include_directories(${OUTPUT_DIR}/../proto)
+include_directories(${OUTPUT_DIR})
 
 # Collect all .proto files in the specified directory
 file(GLOB PROTO_FILES "${PROTO_DIR}/*.proto")

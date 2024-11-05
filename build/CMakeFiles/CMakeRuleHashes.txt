@@ -1,5 +1,3 @@
 # Hashes of file build rules.
-40393e61a2fc8c11e04c700a062b3bfc proto/common.grpc.pb.h
-91c6a0374fef38b295ec3cbc4e876655 proto/common.pb.h
-4c55593390b555148808123959c8248b proto/ingestion.grpc.pb.h
-026a822f8bc3466716aa77003aff08d8 proto/ingestion.pb.h
+e28aa79452fdd9753fdd2e7c75140e3e proto/common.pb.cc
+a39cd58e09fa86eb013d40e6b516e2a4 proto/ingestion.pb.cc

@@ -1,6 +1,6 @@
 /home/nicholas/OspreyProject/build/CMakeFiles/edit_cache.dir
 /home/nicholas/OspreyProject/build/CMakeFiles/rebuild_cache.dir
-/home/nicholas/OspreyProject/build/proto/CMakeFiles/proto.dir
+/home/nicholas/OspreyProject/build/proto/CMakeFiles/ProtoFiles.dir
 /home/nicholas/OspreyProject/build/proto/CMakeFiles/edit_cache.dir
 /home/nicholas/OspreyProject/build/proto/CMakeFiles/rebuild_cache.dir
 /home/nicholas/OspreyProject/build/client/CMakeFiles/client.dir

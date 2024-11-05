@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/nicholas/OspreyProject/build/client
+CXX_INCLUDES = -I/home/nicholas/.local/google -I/home/nicholas/.local/google/lib -I/home/nicholas/OspreyProject/build/client/../proto -I/home/nicholas/OspreyProject/build/server/../proto
 
 CXX_FLAGS = -std=gnu++17
 

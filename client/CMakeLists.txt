@@ -1,14 +1,9 @@
 #
-# Dependencies
-#
-find_package(Threads REQUIRED)
-
-#
 # Sources
 #
 set(SOURCES
     src/main.cpp
-    src/DataProcessor.cpp
+    ## src/DataProcessor.cpp # TODO: missing!
     src/FileReader.cpp
 )
 

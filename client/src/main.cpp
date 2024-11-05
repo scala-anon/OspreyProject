@@ -1,6 +1,5 @@
-#include <ingestion.pb.h>
-#include <ingestion.grpc.pb.h>
-#include <common.pb.h>
+#include "ingestion.grpc.pb.h"
+#include "ingestion.pb.h"
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/arena.h>

@@ -1,8 +1,3 @@
-cmake_minimum_required(VERSION 3.10)
-
-# Set your project name
-project(OspreyProject)
-
 # Find the required packages
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
@@ -22,6 +17,6 @@ add_executable(server ${SOURCES})
 
 target_link_libraries(server
     PRIVATE
-        proto
+        ProtoFiles
 )
-target_include_directories(client PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../proto)
+target_include_directories(server PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../proto)

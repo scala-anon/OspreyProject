@@ -155,7 +155,7 @@ proto/CMakeFiles/ProtoFiles.dir/clean:
 # Target rules for target client/CMakeFiles/client.dir
 
 # All Build rule for target.
-client/CMakeFiles/client.dir/all:
+client/CMakeFiles/client.dir/all: proto/CMakeFiles/ProtoFiles.dir/all
 	$(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/depend
 	$(MAKE) $(MAKESILENT) -f client/CMakeFiles/client.dir/build.make client/CMakeFiles/client.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=8,9,10 "Built target client"
@@ -163,7 +163,7 @@ client/CMakeFiles/client.dir/all:
 
 # Build rule for subdir invocation for target.
 client/CMakeFiles/client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 client/CMakeFiles/client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 0
 .PHONY : client/CMakeFiles/client.dir/rule
@@ -181,7 +181,7 @@ client/CMakeFiles/client.dir/clean:
 # Target rules for target server/CMakeFiles/server.dir
 
 # All Build rule for target.
-server/CMakeFiles/server.dir/all:
+server/CMakeFiles/server.dir/all: proto/CMakeFiles/ProtoFiles.dir/all
 	$(MAKE) $(MAKESILENT) -f server/CMakeFiles/server.dir/build.make server/CMakeFiles/server.dir/depend
 	$(MAKE) $(MAKESILENT) -f server/CMakeFiles/server.dir/build.make server/CMakeFiles/server.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicholas/OspreyProject/build/CMakeFiles --progress-num=11,12 "Built target server"
@@ -189,7 +189,7 @@ server/CMakeFiles/server.dir/all:
 
 # Build rule for subdir invocation for target.
 server/CMakeFiles/server.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 server/CMakeFiles/server.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicholas/OspreyProject/build/CMakeFiles 0
 .PHONY : server/CMakeFiles/server.dir/rule

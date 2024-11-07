@@ -30,8 +30,8 @@ void decodeStatus(uint32_t status, std::ostream &out) {
 }
 
 int main() {
-    std::ifstream inFile("/home/nicholas/Documents/mic1-8-20240511/mic1-8-CH17-20240511-121442.dat", std::ios::binary);
-    std::ofstream outFile("/home/nicholas/Documents/ReformattedFiles/output.txt");
+    std::ifstream inFile("/home/nicholas/OspreyData/mic1-8-20240511/mic1-8-CH17-20240511-121442.dat", std::ios::binary);
+    std::ofstream outFile("/home/nicholas/OspreyProject/client/src/ReformattedFiles/output.txt");
 
     if (!inFile) {
         std::cerr << "Unable to open the file!" << std::endl;

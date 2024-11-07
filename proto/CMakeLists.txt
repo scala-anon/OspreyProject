@@ -1,28 +1,48 @@
-#
-# Protobuf/Grpc source files
-#
+cmake_minimum_required(VERSION 3.10)
 
+# Paths
+set(PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}") # Directory where your .proto files are located
+set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/proto")  # Directory for generated files
 
-#
-# Add Library target with protobuf sources
-#
-add_library(myproto 
-    common.proto
-    ingestion.proto)
+# Include directories for generated files
+include_directories(${OUTPUT_DIR}/../proto)
 
-target_link_libraries(myproto
-    PUBLIC
-        protobuf::libprotobuf
-        gRPC::grpc
-        gRPC::grpc++
-)
-target_include_directories(myproto PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+# Collect all .proto files in the specified directory
+file(GLOB PROTO_FILES "${PROTO_DIR}/*.proto")
 
-#
-# Compile protobuf and grpc files in myproto target to cpp
-#
-get_target_property(grpc_cpp_plugin_location gRPC::grpc_cpp_plugin LOCATION)
+# Path to grpc_cpp_plugin
+set(GRPC_PLUGIN_PATH "/usr/bin/grpc_cpp_plugin")
 
-protobuf_generate(TARGET myproto LANGUAGE cpp APPEND_PATH)
-protobuf_generate(TARGET myproto LANGUAGE grpc APPEND_PATH GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
+# Function to compile .proto files
+foreach(PROTO_FILE ${PROTO_FILES})
+    # Get the file name without the path and extension
+    get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)
+
+    # Set output file paths
+    set(GENERATED_CPP "${OUTPUT_DIR}/${PROTO_NAME}.pb.cc")
+    set(GENERATED_H "${OUTPUT_DIR}/${PROTO_NAME}.pb.h")
+    set(GENERATED_GRPC_CPP "${OUTPUT_DIR}/${PROTO_NAME}.grpc.pb.cc")
+    set(GENERATED_GRPC_H "${OUTPUT_DIR}/${PROTO_NAME}.grpc.pb.h")
+
+    # Add custom command to generate C++ and gRPC C++ files
+    add_custom_command(
+        OUTPUT ${GENERATED_CPP} ${GENERATED_H} ${GENERATED_GRPC_CPP} ${GENERATED_GRPC_H}
+        COMMAND protoc
+        ARGS --proto_path=${PROTO_DIR}
+             --cpp_out=${OUTPUT_DIR}
+             --grpc_out=${OUTPUT_DIR}
+             --plugin=protoc-gen-grpc=${GRPC_PLUGIN_PATH}
+             ${PROTO_FILE}
+        DEPENDS ${PROTO_FILE}
+        COMMENT "Generating C++ and gRPC C++ files from ${PROTO_FILE}"
+        VERBATIM
+    )
+
+    # Add the generated files to the project
+    list(APPEND GENERATED_SOURCES ${GENERATED_CPP} ${GENERATED_GRPC_CPP})
+    list(APPEND GENERATED_HEADERS ${GENERATED_H} ${GENERATED_GRPC_H})
+endforeach()
+
+# Add the generated files to the target
+add_library(ProtoFiles STATIC ${GENERATED_SOURCES} ${GENERATED_HEADERS})
 

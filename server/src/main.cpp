@@ -1,5 +1,5 @@
-#include <ingestion.pb.h>
-#include <ingestion.grpc.pb.h>
+#include "ingestion.grpc.pb.h"
+#include "ingestion.pb.h"
 
 #include <grpc/grpc.h>
 #include <grpcpp/server_builder.h>

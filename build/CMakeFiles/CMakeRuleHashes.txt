@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+e28aa79452fdd9753fdd2e7c75140e3e proto/common.pb.cc
+a39cd58e09fa86eb013d40e6b516e2a4 proto/ingestion.pb.cc

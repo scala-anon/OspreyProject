@@ -1,5 +1,6 @@
 #include "ingestion.grpc.pb.h"
 #include "ingestion.pb.h"
+#include "PacketParser.h"
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/arena.h>
@@ -66,21 +67,27 @@ int main() {
     request.set_providerid(1);
     request.set_clientrequestid("0001");
 
-    auto* requestTime = request.mutable_requesttime();
-    requestTime->set_seconds(1633049600);
-    requestTime->set_nanos(123456789);
-
+    // access dataframe
     auto* dataFrame = request.mutable_ingestiondataframe();
-    auto* timestamps = dataFrame->mutable_datatimestamps()->mutable_samplingclock();
-    timestamps->set_starttime_seconds(1633049600);
-    timestamps->set_starttime_nanos(123456789);
-    timestamps->set_periodnanos(1000);
-    timestamps->set_numsamples(adcValues.size());
+    
+    // access datatimestamps
+    auto* timestamps = dataFrame->mutable_datatimestamps();
+    
+    // acces samplingclock
+    auto* samplingClock = timestamps->mutable_samplingclock();
+
+    // set the start time for the samplingclock
+    auto* startTime = samplingClock->mutable_starttime();
+    
+    startTime->set_epochseconds(12345689);
+    startTime->set_nanoseconds(123456789);
+    samplingClock->set_periodnanos(10000000);
+    samplingClock->set_count(adcValues.size());
 
     auto* dataColumn = dataFrame->add_datacolumns();
     dataColumn->set_name("ADC_Channel");
     for (int32_t value : adcValues) {
-        auto* dataValue = dataColumn->add_values();
+        auto* dataValue = dataColumn->add_datavalues();
         dataValue->set_intvalue(value);
     }
 

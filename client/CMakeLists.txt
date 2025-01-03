@@ -3,7 +3,7 @@
 #
 set(SOURCES
     src/main.cpp
-    ## src/DataProcessor.cpp # TODO: missing!
+    src/PacketParser.cpp
     src/FileReader.cpp
 )
 

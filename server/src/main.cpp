@@ -26,7 +26,7 @@ class IngestionServiceImpl final : public DpIngestionService::Service {
         if (!datarequest->has_ingestiondataframe()) {
             auto* exceptionalResult = dataresponse->mutable_exceptionalresult();
             exceptionalResult->set_message("IngestionDataFrame is missing");
-            return Status::INVALID_ARGUMENT;
+            return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, "IngestionDataFrame is Missing");
         }
 
         const auto& dataFrame = datarequest->ingestiondataframe();
@@ -34,16 +34,17 @@ class IngestionServiceImpl final : public DpIngestionService::Service {
         // Log DataTimestamps
         if (dataFrame.has_datatimestamps() && dataFrame.datatimestamps().has_samplingclock()) {
             const auto& samplingClock = dataFrame.datatimestamps().samplingclock();
-            std::cout << "Start Time (seconds): " << samplingClock.starttime_seconds() << "\n";
-            std::cout << "Start Time (nanoseconds): " << samplingClock.starttime_nanos() << "\n";
+            const auto& start_time = samplingClock.starttime();
+            std::cout << "Start Time (seconds): " << start_time.epochseconds() << "\n";
+            std::cout << "Start Time (nanoseconds): " << start_time.nanoseconds() << "\n";
             std::cout << "Sample Period (nanoseconds): " << samplingClock.periodnanos() << "\n";
-            std::cout << "Number of Samples: " << samplingClock.numsamples() << "\n";
+            std::cout << "Number of Samples: " << samplingClock.count() << "\n";
         }
 
         // Log DataColumn values
         for (const auto& column : dataFrame.datacolumns()) {
             std::cout << "DataColumn: " << column.name() << "\n";
-            for (const auto& value : column.values()) {
+            for (const auto& value : column.datavalues()) {
                 if (value.has_intvalue()) {
                     std::cout << "  IntValue: " << value.intvalue() << "\n";
                 }
@@ -52,7 +53,7 @@ class IngestionServiceImpl final : public DpIngestionService::Service {
 
         // Respond with AckResult
         auto* ackResult = dataresponse->mutable_ackresult();
-        ackResult->set_numrows(dataFrame.datatimestamps().samplingclock().numsamples());
+        ackResult->set_numrows(dataFrame.datatimestamps().samplingclock().count());
         ackResult->set_numcolumns(dataFrame.datacolumns_size());
 
         return Status::OK;

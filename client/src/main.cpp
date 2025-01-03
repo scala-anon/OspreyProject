@@ -58,7 +58,7 @@ int main() {
     OspreyClient client(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()));
 
     // Parse ADC values
-    PacketParser parser("path/to/file.dat");
+    PacketParser parser("data/mic1-8-CH17-20240511-121442.dat");
     parser.parseFile();
     const std::vector<int32_t>& adcValues = parser.getAdcValues();
 

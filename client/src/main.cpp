@@ -1,32 +1,26 @@
+#include "PacketParser.h"
 #include "ingestion.grpc.pb.h"
 #include "ingestion.pb.h"
-#include "PacketParser.h"
 
-#include <google/protobuf/message.h>
-#include <google/protobuf/arena.h>
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <cstdint>
 #include <chrono>
 
-
-// TODO update the set methods for grpc objects
-
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-namespace dp{
-	namespace service{
-		namespace ingestion{
-
+namespace dp {
+namespace service {
+namespace ingestion {
 
 class OspreyClient {
 public:
-    OspreyClient(std::shared_ptr<Channel> channel) : stub_(DpIngestionService::NewStub(channel)) {}
+    OspreyClient(const std::string& server_address) 
+        : stub_(DpIngestionService::NewStub(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()))){}
 
     std::string ingestData(const IngestDataRequest& request) {
         IngestDataResponse response;
@@ -53,11 +47,17 @@ private:
     std::unique_ptr<DpIngestionService::Stub> stub_;
 };
 
-int main() {
-    std::string server_address("localhost:50051");
-    OspreyClient client(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()));
+}
+}
+}
 
-    // Parse ADC values
+int main() {
+    using namespace dp::service::ingestion;
+
+    std::string server_address("localhost:50051");
+    OspreyClient client(server_address);
+
+    // Rest of your main function code
     PacketParser parser("data/mic1-8-CH17-20240511-121442.dat");
     parser.parseFile();
     const std::vector<int32_t>& adcValues = parser.getAdcValues();
@@ -67,35 +67,39 @@ int main() {
     request.set_providerid(1);
     request.set_clientrequestid("0001");
 
-    // access dataframe
     auto* dataFrame = request.mutable_ingestiondataframe();
-    
-    // access datatimestamps
     auto* timestamps = dataFrame->mutable_datatimestamps();
-    
-    // acces samplingclock
     auto* samplingClock = timestamps->mutable_samplingclock();
-
-    // set the start time for the samplingclock
     auto* startTime = samplingClock->mutable_starttime();
     
-    startTime->set_epochseconds(12345689);
-    startTime->set_nanoseconds(123456789);
-    samplingClock->set_periodnanos(10000000);
-    samplingClock->set_count(adcValues.size());
+    // Example with nanoseconds
+    uint64_t epochSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    uint64_t nanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    auto* dataColumn = dataFrame->add_datacolumns();
-    dataColumn->set_name("ADC_Channel");
-    for (int32_t value : adcValues) {
-        auto* dataValue = dataColumn->add_datavalues();
-        dataValue->set_intvalue(value);
+
+    startTime->set_epochseconds(epochSeconds);
+    startTime->set_nanoseconds(nanoSeconds);
+    // 1 second period
+    samplingClock->set_periodnanos(1000000000);
+    // TODO this needs to be number of adc values per PV
+    samplingClock->set_count(1000);
+
+    auto* dataColumn1 = dataFrame->add_datacolumns();
+    dataColumn1->set_name("ADC");
+    auto *dataColumn2 = dataFrame->add_datacolumns();
+    dataColumn2->set_name("TimeStamp(Nanoseconds)");
+
+    for(int i = 0; i <= 100; i++){
+        int64_t timeStamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        auto* timeStampValues = dataColumn2->add_datavalues();
+        timeStampValues->set_intvalue(timeStamp);
+        auto* dataValues = dataColumn1->add_datavalues();
+         dataValues->set_intvalue(adcValues[i]);
     }
-
+   
     client.ingestData(request);
 
     return 0;
 }
-}
-}
-}
+
 

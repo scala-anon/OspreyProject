@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <iomanip>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -43,15 +44,14 @@ class IngestionServiceImpl final : public DpIngestionService::Service {
 
         // Log DataColumn values
         for (const auto& column : dataFrame.datacolumns()) {
-            std::cout << "DataColumn: " << column.name() << "\n";
+            std::cout << column.name() << "\n";
             for (const auto& value : column.datavalues()) {
                 if (value.has_intvalue()) {
-                    std::cout << "  IntValue: " << value.intvalue() << "\n";
+                    std::cout <<  value.intvalue() << "\n";
                 }
             }
         }
-
-        // Respond with AckResult
+       
         auto* ackResult = dataresponse->mutable_ackresult();
         ackResult->set_numrows(dataFrame.datatimestamps().samplingclock().count());
         ackResult->set_numcolumns(dataFrame.datacolumns_size());
@@ -61,7 +61,7 @@ class IngestionServiceImpl final : public DpIngestionService::Service {
 };
 
 void RunServer() {
-    std::string server_address("0.0.0.0:50051");
+    std::string server_address("localhost:50051");
     IngestionServiceImpl service;
 
     ServerBuilder builder;

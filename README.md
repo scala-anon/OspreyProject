@@ -18,6 +18,7 @@ To run and build this application, you will need the following:
 ### 1. Data Preparation
 - You will need your own set of data files.
 - Modify the `client/CMakeLists.txt` to ensure the application has access to your data files.
+- Modify both listening ports in `client/src/main.cpp` and `server/src/main.cpp` to ensure data can be ingested
 
 ### 2. Build the Application
 Follow these steps to build the application:

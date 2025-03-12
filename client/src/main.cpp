@@ -61,10 +61,14 @@ int main() {
     parser.parseFile();
     const std::vector<int32_t>& adcValues = parser.getAdcValues();
 
+    // Define the sample rate and number of samples
+    constexpr size_t sampleCount = 250000;
+    
     // Create IngestDataRequest
     IngestDataRequest request;
+    request.set_providername("Nick");
     request.set_providerid(1);
-    request.set_clientrequestid("0001");
+    request.set_clientrequestid("0002");
 
     auto* dataFrame = request.mutable_ingestiondataframe();
     auto* timestamps = dataFrame->mutable_datatimestamps();
@@ -74,30 +78,32 @@ int main() {
     uint64_t epochSeconds = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     uint64_t nanoSeconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    // NOTE: to calculate sample rate 1/sample_rate * 1,000 to get signal per nanosecond in our case it is 20,000ns/sig
     startTime->set_epochseconds(epochSeconds);
     startTime->set_nanoseconds(nanoSeconds);
-    long double  periodNano = 20000;
+    
+    // For a 250k sample per second rate, each sample is 1e9/250000 = 4000 ns apart
+    long double  periodNano = 4000;
     samplingClock->set_periodnanos(periodNano);
-    // value = adc per sig / ns per signal
-    long double adcPerNs = 483/periodNano;
-    long double pvAmnt = adcPerNs * periodNano * 660;
-    std::cout << adcPerNs << " " << pvAmnt << std::endl;
-    samplingClock->set_count(pvAmnt);
+    samplingClock->set_count(sampleCount);
 
     auto* dataColumn1 = dataFrame->add_datacolumns();
     dataColumn1->set_name("ADC");
     auto* dataColumn2 = dataFrame->add_datacolumns();
     dataColumn2->set_name("TimeStamp(Nanoseconds)");
 
-    for(int i = 0; i <= pvAmnt; i++){
+    for(int i = 0; i <= sampleCount; i++){
+        // Record the current timestamp for this sample
         uint64_t timeStamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        
+        // Add timestamp to the second column
         auto* timeStampValues = dataColumn2->add_datavalues();
         timeStampValues->set_intvalue(timeStamp);
+        
+        // Add the corresponding ADC value to the first data column
         auto* dataValues = dataColumn1->add_datavalues();
          dataValues->set_intvalue(adcValues[i]);
     }
-   
+    std::cout << "DEBUG: Provider ID set to: " << request.providerid() << std::endl;
     client.ingestData(request);
 
     return 0;

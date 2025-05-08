@@ -2,6 +2,7 @@
 #include "PacketParser.h"
 #include "common.pb.h"
 #include "ingestion.pb.h"
+#include "ingestion.grpc.pb.h"
 
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
@@ -138,12 +139,12 @@ dping::RegisterProviderResponse makeRegisterProviderResponseWithResult(uint64_t 
 class OspreyClient {
 public:
     OspreyClient(const std::string& server_address)
-        : stub_(dping::IngestionService::NewStub(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()))) {}
+        : stub_(dp::service::ingestion::DpIngestionService::NewStub(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()))) {}
 
     dping::RegisterProviderResponse sendRegisterProvider(const dping::RegisterProviderRequest& request) {
         dping::RegisterProviderResponse response;
         grpc::ClientContext context;
-        grpc::Status status = stub_->RegisterProvider(&context, request, &response);
+        grpc::Status status = stub_->registerProvider(&context, request, &response);
 
         if (!status.ok()) {
             std::cerr << "RegisterProvider RPC failed: " << status.error_message() << std::endl;
@@ -155,7 +156,7 @@ public:
     std::string ingestData(const dping::IngestDataRequest& request) {
         dping::IngestDataResponse response;
         grpc::ClientContext context;
-        grpc::Status status = stub_->IngestData(&context, request, &response);
+        grpc::Status status = stub_->ingestData(&context, request, &response);
 
         if (status.ok()) {
             if (response.has_ackresult()) {
@@ -173,10 +174,11 @@ public:
     }
 
 private:
-    std::unique_ptr<IngestionService::Stub> stub_;
+    std::unique_ptr<dp::service::ingestion::DpIngestionService::Stub> stub_;
 };
 
 int main() {
+    const size_t CHUNK_SIZE = 1000;
     std::string server_address = "localhost:50051";
     OspreyClient client(server_address);
 
@@ -202,27 +204,29 @@ int main() {
     PacketParser parser("data/mic1-8-CH17-20240511-121442.dat");
     parser.parseFile();
     const std::vector<int32_t>& adcValues = parser.getAdcValues();
-
-    auto clock = makeSamplingClock(nowSec, nowNano, 4000, adcValues.size());
-
-    std::vector<dping::DataValue> adcData, timestampData;
-    for (size_t i = 0; i < adcValues.size(); ++i) {
+   
+    for (size_t start = 0; start < adcValues.size(); start += CHUNK_SIZE) {
+        size_t end = std::min(start + CHUNK_SIZE, adcValues.size());
+        
+        std::vector<DataValue> adcData;
+        std::vector<DataValue> timestampData;
+        for(size_t i = start; i < end; ++i){
         adcData.push_back(makeDataValueWithSInt32(adcValues[i]));
         timestampData.push_back(makeDataValueWithTimestamp(nowSec, nowNano + i * 4000));
-    }
-
-    std::vector<dping::DataColumn> columns = {
+        }
+    
+    std::vector<DataColumn> columns = {
         makeDataColumn("ADC", adcData),
         makeDataColumn("Timestamps", timestampData)
     };
 
-    auto metadata = makeEventMetadata("example event", nowSec, nowNano, nowSec + 1, nowNano + 1000);
+    SamplingClock clock = makeSamplingClock(nowSec, nowNano + start * 4000, 4000, end - start);
+    EventMetadata metadata = makeEventMetadata("chunked upload", nowSec, nowNano + start * 4000, nowSec, nowNano + end * 4000);
 
     auto request = makeIngestDataRequest(
         providerId,
         "0002",
-        nowSec,
-        nowNano,
+        {},
         {},
         metadata,
         clock,
@@ -230,7 +234,7 @@ int main() {
     );
 
     client.ingestData(request);
-
+    }
     return 0;
 }
 

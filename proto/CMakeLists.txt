@@ -8,8 +8,7 @@
 #
 add_library(myproto 
     common.proto
-    ingestion.proto
-    query.proto)
+    ingestion.proto)
 
 target_link_libraries(myproto
     PUBLIC

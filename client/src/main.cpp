@@ -1,3 +1,4 @@
+//TODO fix timestamp logic
 // Combined header
 #include "PacketParser.h"
 #include "common.pb.h"
@@ -182,10 +183,10 @@ int main() {
     std::string server_address = "localhost:50051";
     OspreyClient client(server_address);
 
-    uint64_t nowSec = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
-    uint64_t nowNano = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                           std::chrono::system_clock::now().time_since_epoch()).count();
-
+    uint64_t nowEpochNano = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    uint64_t nowSec = nowEpochNano / 1'000'000'000;
+    uint32_t nowNano = nowEpochNano % 1'000'000'000;
+    
     auto regReq = makeRegisterProviderRequest("Nick", {}, nowSec, nowNano);
     dping::RegisterProviderResponse regResp;
     try {
@@ -212,7 +213,11 @@ int main() {
         std::vector<DataValue> timestampData;
         for(size_t i = start; i < end; ++i){
         adcData.push_back(makeDataValueWithSInt32(adcValues[i]));
-        timestampData.push_back(makeDataValueWithTimestamp(nowSec, nowNano + i * 4000));
+        uint64_t sampleNano = nowEpochNano + i * 4000;
+        uint64_t sampleSec = sampleNano / 1'000'000'000;
+        uint32_t sampleRemNanos = sampleNano % 1'000'000'000;
+
+        timestampData.push_back(makeDataValueWithTimestamp(sampleSec, sampleRemNanos));
         }
     
     std::vector<DataColumn> columns = {
@@ -220,8 +225,18 @@ int main() {
         makeDataColumn("Timestamps", timestampData)
     };
 
-    SamplingClock clock = makeSamplingClock(nowSec, nowNano + start * 4000, 4000, end - start);
-    EventMetadata metadata = makeEventMetadata("chunked upload", nowSec, nowNano + start * 4000, nowSec, nowNano + end * 4000);
+    uint64_t startNano = nowEpochNano + start * 4000;
+    uint64_t stopNano = nowEpochNano + end * 4000;
+
+    uint64_t startSec = startNano / 1'000'000'000;
+    uint32_t startRemNanos = startNano % 1'000'000'000;
+
+    uint64_t stopSec = stopNano / 1'000'000'000;
+    uint32_t stopRemNanos = stopNano % 1'000'000'000;
+
+    SamplingClock clock = makeSamplingClock(startSec, startRemNanos, 4000, end - start);
+    EventMetadata metadata = makeEventMetadata("chunked upload", startSec, startRemNanos, stopSec, stopRemNanos);
+
 
     auto request = makeIngestDataRequest(
         providerId,

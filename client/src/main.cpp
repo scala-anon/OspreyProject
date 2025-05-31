@@ -2,10 +2,12 @@
 #include "PacketParser.h"
 #include "common.pb.h"
 #include "ingestion.pb.h"
+#include "ingestion.grpc.pb.h"
 
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+#include <grpcpp/client_context.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -138,12 +140,12 @@ dping::RegisterProviderResponse makeRegisterProviderResponseWithResult(uint64_t 
 class OspreyClient {
 public:
     OspreyClient(const std::string& server_address)
-        : stub_(dping::IngestionService::NewStub(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()))) {}
+        : stub_(dp::service::ingestion::DpIngestionService::NewStub(grpc::CreateChannel(server_address, grpc::InsecureChannelCredentials()))) {}
 
     dping::RegisterProviderResponse sendRegisterProvider(const dping::RegisterProviderRequest& request) {
         dping::RegisterProviderResponse response;
         grpc::ClientContext context;
-        grpc::Status status = stub_->RegisterProvider(&context, request, &response);
+        grpc::Status status = stub_->registerProvider(&context, request, &response);
 
         if (!status.ok()) {
             std::cerr << "RegisterProvider RPC failed: " << status.error_message() << std::endl;
@@ -155,7 +157,7 @@ public:
     std::string ingestData(const dping::IngestDataRequest& request) {
         dping::IngestDataResponse response;
         grpc::ClientContext context;
-        grpc::Status status = stub_->IngestData(&context, request, &response);
+        grpc::Status status = stub_->ingestData(&context, request, &response);
 
         if (status.ok()) {
             if (response.has_ackresult()) {
@@ -173,7 +175,7 @@ public:
     }
 
 private:
-    std::unique_ptr<IngestionService::Stub> stub_;
+    std::unique_ptr<dp::service::ingestion::DpIngestionService::Stub> stub_;
 };
 
 int main() {
@@ -205,13 +207,13 @@ int main() {
 
     auto clock = makeSamplingClock(nowSec, nowNano, 4000, adcValues.size());
 
-    std::vector<dping::DataValue> adcData, timestampData;
+    std::vector<DataValue> adcData, timestampData;
     for (size_t i = 0; i < adcValues.size(); ++i) {
         adcData.push_back(makeDataValueWithSInt32(adcValues[i]));
         timestampData.push_back(makeDataValueWithTimestamp(nowSec, nowNano + i * 4000));
     }
 
-    std::vector<dping::DataColumn> columns = {
+    std::vector<DataColumn> columns = {
         makeDataColumn("ADC", adcData),
         makeDataColumn("Timestamps", timestampData)
     };
@@ -221,8 +223,7 @@ int main() {
     auto request = makeIngestDataRequest(
         providerId,
         "0002",
-        nowSec,
-        nowNano,
+        {},
         {},
         metadata,
         clock,

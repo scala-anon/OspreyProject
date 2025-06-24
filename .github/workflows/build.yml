@@ -1,33 +1,29 @@
-on: [push, pull_request, workflow_dispatch]
+name: C++ CMake Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  container:
+  build:
     runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.image }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - image: ubuntu:latest
-        - image: debian:latest
 
     steps:
-    - name: System setup
-      shell: bash
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up C++ toolchain
+      uses: actions/setup-python@v5  # Optional, in case Python needed for tools
+    - name: Install dependencies
       run: |
-        apt-get update
-        apt-get -y install build-essential cmake libprotobuf-dev libgrpc++-dev protobuf-compiler-grpc
-    - uses: actions/checkout@v4
-    - name: Versions
-      shell: bash
-      run: |
-        set -x
-        g++ --version
-        cmake --version
-    - name: listing
-      run: dpkg -L libgrpc-dev
-    - name: Configure
+        sudo apt update
+        sudo apt install -y cmake g++ protobuf-compiler libprotobuf-dev libgrpc++-dev
+
+    - name: Configure CMake
       run: cmake -S . -B build
+
     - name: Build
-      run: cmake --build build -j2 -v
+      run: cmake --build build --parallel
+

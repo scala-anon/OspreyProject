@@ -67,10 +67,9 @@ Follow these steps to configure and build the project:
 cd /client/src
 nano main.cpp
 ```
+```text
 alter PacketParser parser("data/mic1-8-CH17-20240511-121442.dat");
-
-# Future version will include cleaner data choice logic
-
+```
 # Create and enter a build directory
 ```bash
 mkdir build && cd build

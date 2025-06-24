@@ -3,6 +3,7 @@
 #
 set(SOURCES
     src/main.cpp
+    src/ingest_client.cpp
     src/PacketParser.cpp
 )
 

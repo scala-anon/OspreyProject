@@ -1,7 +1,7 @@
 # OspreyProject (MLDP Backend) — C++
 
 **Author**: Nicholas Mamais  
-**Affiliation**: SLAC National Accelerator Laboratory  
+**Affiliation**: Osprey Distributed Control Systems
 **Project**: Machine Learning Data Platform (MLDP) Backend Integration  
 **Language**: C++17  
 **Build System**: CMake  

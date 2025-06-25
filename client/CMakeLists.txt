@@ -14,9 +14,15 @@ add_executable(client ${SOURCES})
 target_link_libraries(client
     PRIVATE
         myproto
+        hdf5_cpp
+        hdf5
 )
 
-target_include_directories(client PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(client 
+  PRIVATE 
+  ${CMAKE_CURRENT_BINARY_DIR}
+  /usr/include/hdf5/serial
+)
 
 
 # Define the relative path to the specific data file
